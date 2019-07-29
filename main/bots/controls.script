@@ -1,0 +1,67 @@
+local motor_speed = math.rad(270)
+local max_motor_torque = 30
+local upper_angle = math.rad(80)
+local lower_angle = math.rad(-80)
+
+local properties = {
+	upper_angle = upper_angle,
+	lower_angle = lower_angle,
+	enable_limit = true,
+	enable_motor = true,
+	motor_speed = 0,
+	max_motor_torque = max_motor_torque
+}
+
+
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	physics.create_joint(physics.JOINT_TYPE_HINGE, "/jet#co", "joint", vmath.vector3(0, 25, 0), "/body#co", vmath.vector3(0, -50, 0),  properties)
+	pprint(physics.get_joint_properties("/jet#co", "joint"))
+end
+
+
+function on_message(self, message_id, message, sender)
+	
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("up") then
+		if action.pressed then
+			particlefx.play("/jet#flame")
+		elseif action.released then
+			particlefx.stop("/jet#flame")
+		end
+		dir = vmath.rotate(go.get_rotation("/jet"), vmath.vector3(0, 850, 0))
+		pos = vmath.rotate(go.get_rotation("/jet"), vmath.vector3(0, 30, 0))
+		msg.post("/body#co", "apply_force", {force = dir, position = go.get_world_position("/body") + pos})
+	elseif action_id == hash("left") then
+		if action.pressed then
+			properties.upper_angle = upper_angle
+			properties.lower_angle = lower_angle
+			properties.motor_speed = motor_speed
+			properties.max_motor_torque = max_motor_torque
+			physics.set_joint_properties("/jet#co", "joint", properties)
+		elseif action.released then
+			properties.upper_angle = physics.get_joint_properties("/jet#co", "joint").joint_angle + 0.05
+			properties.lower_angle = physics.get_joint_properties("/jet#co", "joint").joint_angle - 0.05
+			properties.max_motor_torque = 10
+			properties.motor_speed = 0
+			physics.set_joint_properties("/jet#co", "joint", properties)
+		end
+	elseif action_id == hash("right") then
+		if action.pressed then
+			properties.upper_angle = upper_angle
+			properties.lower_angle = lower_angle
+			properties.motor_speed = -motor_speed
+			properties.max_motor_torque = max_motor_torque
+			physics.set_joint_properties("/jet#co", "joint", properties)
+		elseif action.released then
+			properties.upper_angle = physics.get_joint_properties("/jet#co", "joint").joint_angle + 0.05
+			properties.lower_angle = physics.get_joint_properties("/jet#co", "joint").joint_angle - 0.05
+			properties.max_motor_torque = 10
+			properties.motor_speed = 0
+			physics.set_joint_properties("/jet#co", "joint", properties)
+		end
+	end
+end

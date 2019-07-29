@@ -1,0 +1,12 @@
+images {
+  image: "/assets/bots/body.png"
+}
+images {
+  image: "/assets/bots/jet.png"
+}
+images {
+  image: "/assets/bots/flame.png"
+}
+margin: 0
+extrude_borders: 0
+inner_padding: 1
