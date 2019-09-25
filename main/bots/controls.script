@@ -1,67 +1,153 @@
-local motor_speed = math.rad(270)
-local max_motor_torque = 30
-local upper_angle = math.rad(80)
-local lower_angle = math.rad(-80)
+go.property("player", 1)
+go.property("up", 1)
+go.property("left", 1)
+go.property("right", 1)
+go.property("jet_left", false)
+go.property("jet_right", false)
+go.property("jet1", false)
+go.property("jet2", false)
+go.property("key_pressed_left", false)
+go.property("key_pressed_right", false)
 
-local properties = {
-	upper_angle = upper_angle,
-	lower_angle = lower_angle,
-	enable_limit = true,
-	enable_motor = true,
-	motor_speed = 0,
-	max_motor_torque = max_motor_torque
+local jet_strength = {
+	jet1 = 600,
+	jet2 = 600,
+	jet_right = 850,
+	jet_left = 850
 }
 
-
+local jet_configs = {right = {jet_left = true, jet1 = true}, left = {jet_right = true, jet2 = true}, up = {jet1 = true, jet2 = true}, none = {}}
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
-	physics.create_joint(physics.JOINT_TYPE_HINGE, "/jet#co", "joint", vmath.vector3(0, 25, 0), "/body#co", vmath.vector3(0, -50, 0),  properties)
-	pprint(physics.get_joint_properties("/jet#co", "joint"))
+	physics.create_joint(physics.JOINT_TYPE_HINGE, "body#co_head", "joint", vmath.vector3(0, 0, 0), "body#co_body", vmath.vector3(0, 0, 0),
+	{upper_angle = math.rad(0), lower_angle = math.rad(0), enable_limit = true})
+	
+	physics.create_joint(physics.JOINT_TYPE_HINGE, "jet1#co", "joint", vmath.vector3(0, 0, 0), "body#co_body", vmath.vector3(-15, -30, 0),
+	{upper_angle = math.rad(45), lower_angle = math.rad(45), enable_limit = true})
+	
+	physics.create_joint(physics.JOINT_TYPE_HINGE, "jet2#co", "joint", vmath.vector3(0, 0, 0), "body#co_body", vmath.vector3(15, -30, 0),
+	{upper_angle = math.rad(-45), lower_angle = math.rad(-45), enable_limit = true})
+	physics.create_joint(physics.JOINT_TYPE_HINGE, "jet_left#co", "joint", vmath.vector3(0, 0, 0), "body#co_body", vmath.vector3(-20, 0, 0),
+	{upper_angle = math.rad(120), lower_angle = math.rad(120), enable_limit = true})
+	physics.create_joint(physics.JOINT_TYPE_HINGE, "jet_right#co", "joint", vmath.vector3(0, 0, 0), "body#co_body", vmath.vector3(20, 0, 0),
+	{upper_angle = math.rad(-120), lower_angle = math.rad(-120), enable_limit = true})
+	if self.player == 1 then
+		self.up = hash("p1_up")
+		self.left = hash("p1_left")
+		self.right = hash("p1_right")
+	else
+		self.up = hash("p2_up")
+		self.left = hash("p2_left")
+		self.right = hash("p2_right")
+		sprite.play_flipbook("body#body", "body2")
+		sprite.play_flipbook("jet1#jet", "jet2")
+		sprite.play_flipbook("jet2#jet", "jet2")
+		sprite.play_flipbook("jet_left#jet", "jet2")
+		sprite.play_flipbook("jet_right#jet", "jet2")
+	end
 end
-
 
 function on_message(self, message_id, message, sender)
-	
-end
-
-function on_input(self, action_id, action)
-	if action_id == hash("up") then
-		if action.pressed then
-			particlefx.play("/jet#flame")
-		elseif action.released then
-			particlefx.stop("/jet#flame")
-		end
-		dir = vmath.rotate(go.get_rotation("/jet"), vmath.vector3(0, 850, 0))
-		pos = vmath.rotate(go.get_rotation("/jet"), vmath.vector3(0, 30, 0))
-		msg.post("/body#co", "apply_force", {force = dir, position = go.get_world_position("/body") + pos})
-	elseif action_id == hash("left") then
-		if action.pressed then
-			properties.upper_angle = upper_angle
-			properties.lower_angle = lower_angle
-			properties.motor_speed = motor_speed
-			properties.max_motor_torque = max_motor_torque
-			physics.set_joint_properties("/jet#co", "joint", properties)
-		elseif action.released then
-			properties.upper_angle = physics.get_joint_properties("/jet#co", "joint").joint_angle + 0.05
-			properties.lower_angle = physics.get_joint_properties("/jet#co", "joint").joint_angle - 0.05
-			properties.max_motor_torque = 10
-			properties.motor_speed = 0
-			physics.set_joint_properties("/jet#co", "joint", properties)
-		end
-	elseif action_id == hash("right") then
-		if action.pressed then
-			properties.upper_angle = upper_angle
-			properties.lower_angle = lower_angle
-			properties.motor_speed = -motor_speed
-			properties.max_motor_torque = max_motor_torque
-			physics.set_joint_properties("/jet#co", "joint", properties)
-		elseif action.released then
-			properties.upper_angle = physics.get_joint_properties("/jet#co", "joint").joint_angle + 0.05
-			properties.lower_angle = physics.get_joint_properties("/jet#co", "joint").joint_angle - 0.05
-			properties.max_motor_torque = 10
-			properties.motor_speed = 0
-			physics.set_joint_properties("/jet#co", "joint", properties)
+	if message_id == hash("collision_response") then
+		if message.own_group == hash("head") then
+			msg.post(".", "release_input_focus")
+			particlefx.stop("jet1#flame")
+			particlefx.stop("jet2#flame")
+			particlefx.stop("jet_left#flame")
+			particlefx.stop("jet_right#flame")
+			msg.post(".", "disable")
+			msg.post("/main", "death", {player = self.player})
 		end
 	end
+end
+
+
+function on_input(self, action_id, action)
+	if action_id == self.left then
+		if action.released then
+			self.key_pressed_left = false
+		else
+			self.key_pressed_left = true
+		end
+	elseif action_id == self.right then
+		if action.released then
+			self.key_pressed_right = false
+		else
+			self.key_pressed_right = true
+		end
+	end
+
+	local jets = {jet_left = self.jet_left, jet_right = self.jet_right, jet1 = self.jet1, jet2 = self.jet2}
+
+	local config
+	if self.key_pressed_left and self.key_pressed_right then
+		config = "up"
+	elseif self.key_pressed_left then
+		config = "left"
+	elseif self.key_pressed_right then
+		config = "right"
+	else
+		config = "none"
+	end
+
+	for active_jet, val in pairs(jets) do
+		if jet_configs[config][active_jet] then
+			if not self[active_jet] then
+				particlefx.play(active_jet.."#flame")
+				self[active_jet] = true
+			end
+			if self[active_jet] then
+				dir = vmath.rotate(go.get_rotation(active_jet), vmath.vector3(0, jet_strength[active_jet], 0))
+				pos = vmath.rotate(go.get_rotation(active_jet), vmath.vector3(0, 0, 0))
+				msg.post("body#co_body", "apply_force", {force = dir, position = go.get_world_position("body") + pos})
+			end
+		else
+			if self[active_jet] then
+				particlefx.stop(active_jet.."#flame")
+				self[active_jet] = false
+			end
+		end
+	end
+	--[[
+			
+		if self.jet_left then
+			particlefx.stop("jet_left#flame")
+			self.jet_left = nil
+		end
+		if self.jet_right then
+			particlefx.stop("jet_right#flame")
+			self.jet_right = nil
+		end
+		if not self.jet1 then
+			particlefx.play("jet1#flame")
+			self.jet1 = true
+		end
+		if not self.jet then
+			particlefx.play("jet#flame")
+			self.jet = true
+		end
+		dir = vmath.rotate(go.get_rotation(jet), vmath.vector3(0, jet_strength[jet], 0))
+		pos = vmath.rotate(go.get_rotation(jet), vmath.vector3(0, 0, 0))
+		msg.post("body#co_body", "apply_force", {force = dir, position = go.get_world_position("body") + pos})
+		dir = vmath.rotate(go.get_rotation(jet1), vmath.vector3(0, jet_strength[jet1], 0))
+		pos = vmath.rotate(go.get_rotation(jet1), vmath.vector3(0, 0, 0))
+		msg.post("body#co_body", "apply_force", {force = dir, position = go.get_world_position("body") + pos})
+	else
+		--]]
+		
+	--[[
+	for key, val in pairs(jet_active) do
+		if val == false then
+			particlefx.stop(key.."#flame")
+		else
+			dir = vmath.rotate(go.get_rotation(key), vmath.vector3(0, jet_strength[key], 0))
+			pos = vmath.rotate(go.get_rotation(key), vmath.vector3(0, 0, 0))
+			msg.post("body#co_body", "apply_force", {force = dir, position = go.get_world_position("body") + pos})
+		end
+		if val == hash("start") then
+			particlefx.play(key.."#flame")
+		end
+	end
+	--]]
 end
