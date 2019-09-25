@@ -1,14 +1,26 @@
 key_trigger {
   input: KEY_UP
-  action: "up"
+  action: "p1_up"
 }
 key_trigger {
   input: KEY_LEFT
-  action: "left"
+  action: "p1_left"
 }
 key_trigger {
   input: KEY_RIGHT
-  action: "right"
+  action: "p1_right"
+}
+key_trigger {
+  input: KEY_W
+  action: "p2_up"
+}
+key_trigger {
+  input: KEY_A
+  action: "p2_left"
+}
+key_trigger {
+  input: KEY_D
+  action: "p2_right"
 }
 mouse_trigger {
   input: MOUSE_BUTTON_1
