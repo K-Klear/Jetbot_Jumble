@@ -12,8 +12,8 @@ go.property("key_pressed_right", false)
 local jet_strength = {
 	jet1 = 600,
 	jet2 = 600,
-	jet_right = 850,
-	jet_left = 850
+	jet_right = 750,
+	jet_left = 750
 }
 
 local jet_configs = {right = {jet_left = true, jet1 = true}, left = {jet_right = true, jet2 = true}, up = {jet1 = true, jet2 = true}, none = {}}
