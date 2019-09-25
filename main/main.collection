@@ -3,8 +3,8 @@ instances {
   id: "floor"
   prototype: "/main/world/floor.go"
   position {
-    x: 297.0
-    y: 12.0
+    x: 458.0
+    y: 21.0
     z: 0.0
   }
   rotation {
@@ -23,8 +23,8 @@ instances {
   id: "floor1"
   prototype: "/main/world/floor.go"
   position {
-    x: 768.0
-    y: 12.0
+    x: 929.0
+    y: 21.0
     z: 0.0
   }
   rotation {
@@ -43,8 +43,8 @@ instances {
   id: "floor2"
   prototype: "/main/world/floor.go"
   position {
-    x: 1053.0
-    y: 238.0
+    x: 1214.0
+    y: 247.0
     z: 0.0
   }
   rotation {
@@ -63,8 +63,8 @@ instances {
   id: "floor3"
   prototype: "/main/world/floor.go"
   position {
-    x: 67.0
-    y: 254.0
+    x: 228.0
+    y: 263.0
     z: 0.0
   }
   rotation {
@@ -83,8 +83,8 @@ instances {
   id: "floor4"
   prototype: "/main/world/floor.go"
   position {
-    x: 283.0
-    y: 556.0
+    x: 444.0
+    y: 565.0
     z: 0.0
   }
   rotation {
@@ -103,8 +103,8 @@ instances {
   id: "floor5"
   prototype: "/main/world/floor.go"
   position {
-    x: 894.0
-    y: 558.0
+    x: 1055.0
+    y: 567.0
     z: 0.0
   }
   rotation {
@@ -123,8 +123,8 @@ instances {
   id: "floor6"
   prototype: "/main/world/floor.go"
   position {
-    x: 612.0
-    y: 610.0
+    x: 773.0
+    y: 619.0
     z: 0.0
   }
   rotation {
