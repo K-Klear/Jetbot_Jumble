@@ -1,36 +1,24 @@
 local score = {0, 0}
 local buttons = {}
 
-
 function init(self)
-	msg.post(".", "acquire_input_focus")
 	buttons.p1_left = gui.get_node("button_player1_left")
 	buttons.p1_right = gui.get_node("button_player1_right")
+	buttons.p1_up = gui.get_node("button_player1_up")
 	buttons.p2_left = gui.get_node("button_player2_left")
 	buttons.p2_right = gui.get_node("button_player2_right")
+	buttons.p2_up = gui.get_node("button_player2_up")
 end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("death") then
 		score[message.player] = score[message.player] + 1
 		gui.set_text(gui.get_node("score_"..message.player), score[message.player])
-	end
-end
-
-function on_input(self, action_id, action)
-	if action_id == hash("touch") then
-		if action.released then
-			for key, val in pairs(buttons) do
-				if gui.pick_node(val, action.x, action.y) then
-					gui.set_color(val, vmath.vector4(0.1, 0.1, 0.1, 1))
-				end
-			end
+	elseif message_id == hash("button_state") then
+		if message.state then
+			gui.set_color(buttons[message.button], vmath.vector4(1, 1, 1, 1))
 		else
-			for key, val in pairs(buttons) do
-				if gui.pick_node(val, action.x, action.y) then
-					gui.set_color(val, vmath.vector4(1, 1, 1, 1))
-				end
-			end
+			gui.set_color(buttons[message.button], vmath.vector4(0.1, 0.1, 0.1, 1))
 		end
 	end
 end

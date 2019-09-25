@@ -20,7 +20,7 @@ instances {
   }
 }
 instances {
-  id: "jet_left"
+  id: "jet_top_left"
   prototype: "/main/bots/jet.go"
   position {
     x: 0.0
@@ -40,7 +40,7 @@ instances {
   }
 }
 instances {
-  id: "jet1"
+  id: "jet_bottom_left"
   prototype: "/main/bots/jet.go"
   position {
     x: 0.0
@@ -60,7 +60,7 @@ instances {
   }
 }
 instances {
-  id: "jet2"
+  id: "jet_bottom_right"
   prototype: "/main/bots/jet.go"
   position {
     x: 0.0
@@ -80,7 +80,7 @@ instances {
   }
 }
 instances {
-  id: "jet_right"
+  id: "jet_top_right"
   prototype: "/main/bots/jet.go"
   position {
     x: 0.0

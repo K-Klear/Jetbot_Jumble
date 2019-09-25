@@ -1,18 +1,75 @@
 local respawn_time = 3
 local jetbot = {}
+local spawn_location = {vmath.vector3(950, 300, 0), vmath.vector3(450, 300, 0)}
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
 	msg.post("@render:", "use_fixed_fit_projection", {near = -1, far = 1})
 	local props = {}
 	props[hash("/body")] = {player = 1}
-	jetbot[1] = collectionfactory.create("#spawn_jetbot", vmath.vector3(700, 300, 0), nil, props, vmath.vector3(0.5, 0.5, 1))
+	jetbot[1] = collectionfactory.create("#spawn_jetbot", spawn_location[1], nil, props, vmath.vector3(0.5, 0.5, 1))
 	props[hash("/body")] = {player = 2}
-	jetbot[2] = collectionfactory.create("#spawn_jetbot", vmath.vector3(300, 300, 0), nil, props, vmath.vector3(0.5, 0.5, 1))
+	jetbot[2] = collectionfactory.create("#spawn_jetbot", spawn_location[2], nil, props, vmath.vector3(0.5, 0.5, 1))
+end
+
+local buttons = {
+	p2_right = {0, 200, 0, 200},
+	p2_up = {0, 200, 260, 460},
+	p2_left = {0, 200, 520, 720},
+	p1_right = {1240, 1440, 520, 720},
+	p1_up = {1240, 1440, 260, 460},
+	p1_left = {1240, 1440, 0, 200},
+}
+
+local function pick_button(coords, x, y)
+	if x > coords[1] and x < coords[2] and y > coords[3] and y < coords[4] then return true end
 end
 
 function on_input(self, action_id, action)
-
+	-- msg.post(jetbot[1][hash("/body")], "disable")
+	local buttons_held = {}
+	if action_id == hash("touch") then
+		for i, touch_action in ipairs(action.touch) do
+			for key, val in pairs(buttons) do
+				if pick_button(val, touch_action.x, touch_action.y) and not touch_action.released then
+					buttons_held[key] = true
+				end
+			end
+		end
+		for key in pairs(buttons) do
+			if buttons_held[key] then
+				msg.post(".", "button_state", {state = true, button = key})
+			else
+				msg.post(".", "button_state", {state = false, button = key})
+			end
+		end
+	elseif action_id == hash("click") then
+		for key, val in pairs(buttons) do
+			if pick_button(val, action.x, action.y) and not action.released then
+				buttons_held[key] = true
+			end
+		end
+		for key in pairs(buttons) do
+			if buttons_held[key] then
+				msg.post(".", "button_state", {state = true, button = key})
+				if key == "p1_right" then
+					msg.post(jetbot[1][hash("/body")], "button_pressed", {button = "key_pressed_right"})
+				elseif key == "p1_left" then
+					msg.post(jetbot[1][hash("/body")], "button_pressed", {button = "key_pressed_left"})
+				elseif key == "p1_up" then
+					msg.post(jetbot[1][hash("/body")], "button_pressed", {button = "key_pressed_up"})
+				elseif key == "p2_right" then
+					msg.post(jetbot[2][hash("/body")], "button_pressed", {button = "key_pressed_right"})
+				elseif key == "p2_left" then
+					msg.post(jetbot[2][hash("/body")], "button_pressed", {button = "key_pressed_left"})
+				elseif key == "p2_up" then
+					msg.post(jetbot[2][hash("/body")], "button_pressed", {button = "key_pressed_up"})
+				end
+			else
+				msg.post(".", "button_state", {state = false, button = key})
+			end
+		end
+	end
 end
 
 local f_respawn = {
@@ -20,13 +77,13 @@ local f_respawn = {
 		go.delete(jetbot[1])
 		local props = {}
 		props[hash("/body")] = {player = 1}
-		jetbot[1] = collectionfactory.create("#spawn_jetbot", vmath.vector3(700, 300, 0), nil, props, vmath.vector3(0.5, 0.5, 1))
+		jetbot[1] = collectionfactory.create("#spawn_jetbot", spawn_location[1], nil, props, vmath.vector3(0.5, 0.5, 1))
 	end,
 	function ()
 		go.delete(jetbot[2])
 		local props = {}
 		props[hash("/body")] = {player = 2}
-		jetbot[2] = collectionfactory.create("#spawn_jetbot", vmath.vector3(300, 300, 0), nil, props, vmath.vector3(0.5, 0.5, 1))
+		jetbot[2] = collectionfactory.create("#spawn_jetbot", spawn_location[2], nil, props, vmath.vector3(0.5, 0.5, 1))
 	end
 }
 
