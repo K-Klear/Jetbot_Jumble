@@ -1,0 +1,9 @@
+images {
+  image: "/assets/arena/chain1.png"
+}
+images {
+  image: "/assets/arena/chain2.png"
+}
+margin: 1
+extrude_borders: 0
+inner_padding: 1

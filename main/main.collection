@@ -1,147 +1,8 @@
 name: "main"
-instances {
-  id: "floor"
-  prototype: "/main/world/floor.go"
-  position {
-    x: 458.0
-    y: 21.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-instances {
-  id: "floor1"
-  prototype: "/main/world/floor.go"
-  position {
-    x: 929.0
-    y: 21.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-instances {
-  id: "floor2"
-  prototype: "/main/world/floor.go"
-  position {
-    x: 1214.0
-    y: 247.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: -0.782985
-    w: 0.62204057
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-instances {
-  id: "floor3"
-  prototype: "/main/world/floor.go"
-  position {
-    x: 228.0
-    y: 263.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: -0.6954536
-    w: 0.718571
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-instances {
-  id: "floor4"
-  prototype: "/main/world/floor.go"
-  position {
-    x: 444.0
-    y: 565.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.13700272
-    w: 0.99057066
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-instances {
-  id: "floor5"
-  prototype: "/main/world/floor.go"
-  position {
-    x: 1055.0
-    y: 567.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: -0.20206764
-    w: 0.97937155
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-instances {
-  id: "floor6"
-  prototype: "/main/world/floor.go"
-  position {
-    x: 773.0
-    y: 619.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.029612726
-    w: 0.9995614
-  }
-  scale3 {
-    x: 0.459
-    y: 1.08
-    z: 1.08
-  }
-}
 scale_along_z: 0
 embedded_instances {
   id: "main"
+  children: "arena"
   data: "components {\n"
   "  id: \"main\"\n"
   "  component: \"/main/main.script\"\n"
@@ -190,9 +51,92 @@ embedded_instances {
   "    w: 1.0\n"
   "  }\n"
   "}\n"
+  "embedded_components {\n"
+  "  id: \"spawn_chain\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/main/links/chain_link.go\\\"\\n"
+  "load_dynamically: false\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
   ""
   position {
     x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "arena"
+  data: "components {\n"
+  "  id: \"arena\"\n"
+  "  component: \"/main/world/arena.tilemap\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"collisionobject\"\n"
+  "  type: \"collisionobject\"\n"
+  "  data: \"collision_shape: \\\"/main/world/arena.tilemap\\\"\\n"
+  "type: COLLISION_OBJECT_TYPE_STATIC\\n"
+  "mass: 0.0\\n"
+  "friction: 0.0\\n"
+  "restitution: 1.0\\n"
+  "group: \\\"wall\\\"\\n"
+  "mask: \\\"wall\\\"\\n"
+  "mask: \\\"body\\\"\\n"
+  "mask: \\\"head\\\"\\n"
+  "mask: \\\"jet\\\"\\n"
+  "mask: \\\"chain\\\"\\n"
+  "linear_damping: 0.0\\n"
+  "angular_damping: 0.0\\n"
+  "locked_rotation: false\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 200.0
     y: 0.0
     z: 0.0
   }

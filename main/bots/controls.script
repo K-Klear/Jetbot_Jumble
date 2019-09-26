@@ -14,10 +14,10 @@ go.property("alive", true)
 local jet_strength_multiplier = 1
 
 local jet_strength = {
-	jet_bottom_left = 600 * jet_strength_multiplier,
-	jet_bottom_right = 600 * jet_strength_multiplier,
-	jet_top_right = 750 * jet_strength_multiplier,
-	jet_top_left = 750 * jet_strength_multiplier
+	jet_bottom_left = 1000 * jet_strength_multiplier,
+	jet_bottom_right = 1000 * jet_strength_multiplier,
+	jet_top_right = 1250 * jet_strength_multiplier,
+	jet_top_left = 1250 * jet_strength_multiplier
 }
 
 function init(self)
@@ -50,23 +50,33 @@ function init(self)
 	end
 end
 
+local function die(self)
+	self.alive = false
+	self.key_pressed_left = false
+	self.key_pressed_right = false
+	self.key_pressed_up = false
+	msg.post(".", "release_input_focus")
+	particlefx.stop("jet_bottom_left#flame")
+	particlefx.stop("jet_bottom_right#flame")
+	particlefx.stop("jet_top_left#flame")
+	particlefx.stop("jet_top_right#flame")
+	msg.post(".", "disable")
+	msg.post("/main", "death", {player = self.player})
+	msg.post("jet_bottom_left", "death")
+	msg.post("jet_bottom_right", "death")
+	msg.post("jet_top_left", "death")
+	msg.post("jet_top_right", "death")
+end
+
 function on_message(self, message_id, message, sender)
 	if message_id == hash("collision_response") then
-		if message.own_group == hash("head") then
-			self.alive = false
-			self.key_pressed_left = false
-			self.key_pressed_right = false
-			self.key_pressed_up = false
-			msg.post(".", "release_input_focus")
-			particlefx.stop("jet_bottom_left#flame")
-			particlefx.stop("jet_bottom_right#flame")
-			particlefx.stop("jet_top_left#flame")
-			particlefx.stop("jet_top_right#flame")
-			msg.post(".", "disable")
-			msg.post("/main", "death", {player = self.player})
+		if message.group == hash("spikes") then
+			die(self)
 		end
 	elseif message_id == hash("button_pressed") then
 		self[message.button] = true
+	elseif message_id == hash("death") then
+		die(self)
 	end
 end
 

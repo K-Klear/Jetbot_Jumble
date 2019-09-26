@@ -13,17 +13,34 @@ components {
     w: 1.0
   }
 }
+components {
+  id: "jet_script"
+  component: "/main/bots/jet_script.script"
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
 embedded_components {
   id: "co"
   type: "collisionobject"
   data: "collision_shape: \"\"\n"
   "type: COLLISION_OBJECT_TYPE_DYNAMIC\n"
   "mass: 0.15\n"
-  "friction: 1.0\n"
-  "restitution: 0.5\n"
-  "group: \"bot\"\n"
+  "friction: 0.0\n"
+  "restitution: 0.7\n"
+  "group: \"jet\"\n"
   "mask: \"wall\"\n"
-  "mask: \"bot\"\n"
+  "mask: \"body\"\n"
+  "mask: \"jet\"\n"
+  "mask: \"spikes\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
   "    shape_type: TYPE_BOX\n"
@@ -64,8 +81,8 @@ embedded_components {
   "  data: 20.0\n"
   "  data: 10.0\n"
   "}\n"
-  "linear_damping: 0.5\n"
-  "angular_damping: 0.9\n"
+  "linear_damping: 0.3\n"
+  "angular_damping: 0.3\n"
   "locked_rotation: false\n"
   ""
   position {

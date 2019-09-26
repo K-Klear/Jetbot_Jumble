@@ -1,0 +1,12 @@
+function init(self)
+	self.alive = true
+end
+
+function on_message(self, message_id, message, sender)
+	if self.alive and message_id == hash("collision_response") and message.group == hash("spikes") then
+		msg.post("body", "death")
+		self.alive = false
+	elseif message_id == hash("death") then
+		self.alive = false
+	end
+end
