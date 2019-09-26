@@ -39,6 +39,19 @@ function on_input(self, action_id, action)
 		for key in pairs(buttons) do
 			if buttons_held[key] then
 				msg.post(".", "button_state", {state = true, button = key})
+				if key == "p1_right" then
+					msg.post(jetbot[1][hash("/body")], "button_pressed", {button = "key_pressed_right"})
+				elseif key == "p1_left" then
+					msg.post(jetbot[1][hash("/body")], "button_pressed", {button = "key_pressed_left"})
+				elseif key == "p1_up" then
+					msg.post(jetbot[1][hash("/body")], "button_pressed", {button = "key_pressed_up"})
+				elseif key == "p2_right" then
+					msg.post(jetbot[2][hash("/body")], "button_pressed", {button = "key_pressed_right"})
+				elseif key == "p2_left" then
+					msg.post(jetbot[2][hash("/body")], "button_pressed", {button = "key_pressed_left"})
+				elseif key == "p2_up" then
+					msg.post(jetbot[2][hash("/body")], "button_pressed", {button = "key_pressed_up"})
+				end
 			else
 				msg.post(".", "button_state", {state = false, button = key})
 			end

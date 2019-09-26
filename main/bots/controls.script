@@ -9,8 +9,9 @@ go.property("jet_bottom_right", false)
 go.property("key_pressed_left", false)
 go.property("key_pressed_right", false)
 go.property("key_pressed_up", false)
+go.property("alive", true)
 
-local jet_strength_multiplier = 3
+local jet_strength_multiplier = 1
 
 local jet_strength = {
 	jet_bottom_left = 600 * jet_strength_multiplier,
@@ -52,6 +53,10 @@ end
 function on_message(self, message_id, message, sender)
 	if message_id == hash("collision_response") then
 		if message.own_group == hash("head") then
+			self.alive = false
+			self.key_pressed_left = false
+			self.key_pressed_right = false
+			self.key_pressed_up = false
 			msg.post(".", "release_input_focus")
 			particlefx.stop("jet_bottom_left#flame")
 			particlefx.stop("jet_bottom_right#flame")
@@ -66,34 +71,36 @@ function on_message(self, message_id, message, sender)
 end
 
 function update(self, dt)
-	local jets = {jet_top_left = self.jet_top_left, jet_top_right = self.jet_top_right, jet_bottom_left = self.jet_bottom_left, jet_bottom_right = self.jet_bottom_right}
-	local config = {}
-	if self.key_pressed_left == true then config.jet_top_right = true end
-	if self.key_pressed_right == true then config.jet_top_left = true end
-	if self.key_pressed_up == true then config.jet_bottom_right = true; config.jet_bottom_left = true end
+	if self.alive then
+		local jets = {jet_top_left = self.jet_top_left, jet_top_right = self.jet_top_right, jet_bottom_left = self.jet_bottom_left, jet_bottom_right = self.jet_bottom_right}
+		local config = {}
+		if self.key_pressed_left == true then config.jet_top_right = true end
+		if self.key_pressed_right == true then config.jet_top_left = true end
+		if self.key_pressed_up == true then config.jet_bottom_right = true; config.jet_bottom_left = true end
 
-	for active_jet, val in pairs(jets) do
-		if config[active_jet] then
-			if not self[active_jet] then
-				particlefx.play(active_jet.."#flame")
-				self[active_jet] = true
-			end
-			if self[active_jet] then
-				dir = vmath.rotate(go.get_rotation(active_jet), vmath.vector3(0, jet_strength[active_jet], 0))
-				pos = vmath.rotate(go.get_rotation(active_jet), vmath.vector3(0, 0, 0))
-				msg.post("body#co_body", "apply_force", {force = dir, position = go.get_world_position("body") + pos})
-			end
-		else
-			if self[active_jet] then
-				particlefx.stop(active_jet.."#flame")
-				self[active_jet] = false
+		for active_jet, val in pairs(jets) do
+			if config[active_jet] then
+				if not self[active_jet] then
+					particlefx.play(active_jet.."#flame")
+					self[active_jet] = true
+				end
+				if self[active_jet] then
+					dir = vmath.rotate(go.get_rotation(active_jet), vmath.vector3(0, jet_strength[active_jet], 0))
+					pos = vmath.rotate(go.get_rotation(active_jet), vmath.vector3(0, 0, 0))
+					msg.post("body#co_body", "apply_force", {force = dir, position = go.get_world_position("body") + pos})
+				end
+			else
+				if self[active_jet] then
+					particlefx.stop(active_jet.."#flame")
+					self[active_jet] = false
+				end
 			end
 		end
+		
+		self.key_pressed_left = false
+		self.key_pressed_right = false
+		self.key_pressed_up = false
 	end
-	
-	self.key_pressed_left = false
-	self.key_pressed_right = false
-	self.key_pressed_up = false
 end
 
 
