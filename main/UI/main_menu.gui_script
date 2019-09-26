@@ -1,0 +1,107 @@
+local settings = require("main/game_settings")
+
+local btn, lbl
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	btn = {
+		start = gui.get_node("start_btn"),
+		score_up = gui.get_node("score_arrow_up"),
+		score_down = gui.get_node("score_arrow_down"),
+		powerups = gui.get_node("powerups_box"),
+		powerups_secret = gui.get_node("powerups_secret_box"),
+		curses = gui.get_node("curses_box"),
+		curses_secret = gui.get_node("curses_secret_box"),
+	}
+	lbl = {
+		score = gui.get_node("score_val"),
+		powerups_secret = gui.get_node("powerups_secret_lbl"),
+		curses_secret = gui.get_node("curses_secret_lbl"),
+	}
+	
+	gui.set_text(lbl.score, settings.max_score)
+	if settings.powerups then
+		gui.play_flipbook(btn.powerups, "yes")
+		gui.set_color(lbl.powerups_secret, vmath.vector4(1, 1, 1, 1))
+		gui.set_color(btn.powerups_secret, vmath.vector4(1, 1, 1, 1))
+	else
+		gui.play_flipbook(btn.powerups, "no")
+		gui.set_color(lbl.powerups_secret, vmath.vector4(1, 1, 1, 0.1))
+		gui.set_color(btn.powerups_secret, vmath.vector4(1, 1, 1, 0.1))
+	end
+	if settings.powerups_secret then
+		gui.play_flipbook(btn.powerups_secret, "yes")
+	else
+		gui.play_flipbook(btn.powerups_secret, "no")
+	end
+	if settings.curses then
+		gui.play_flipbook(btn.curses, "yes")
+		gui.set_color(lbl.curses_secret, vmath.vector4(1, 1, 1, 1))
+		gui.set_color(btn.curses_secret, vmath.vector4(1, 1, 1, 1))
+	else
+		gui.play_flipbook(btn.curses, "no")
+		gui.set_color(lbl.curses_secret, vmath.vector4(1, 1, 1, 0.1))
+		gui.set_color(btn.curses_secret, vmath.vector4(1, 1, 1, 0.1))
+	end
+	if settings.curses_secret then
+		gui.play_flipbook(btn.curses_secret, "yes")
+	else
+		gui.play_flipbook(btn.curses_secret, "no")
+	end
+end
+
+function on_message(self, message_id, message, sender)
+
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("click") and action.pressed then
+		if gui.pick_node(btn.start, action.x, action.y) then
+			msg.post(msg.url("bootstrap:/go"), "start")
+		elseif gui.pick_node(btn.score_up, action.x, action.y) then
+			settings.max_score = settings.max_score + 1
+			gui.set_text(lbl.score, settings.max_score)
+		elseif gui.pick_node(btn.score_down, action.x, action.y) and settings.max_score > 1 then
+			settings.max_score = settings.max_score - 1
+			gui.set_text(lbl.score, settings.max_score)
+		elseif gui.pick_node(btn.powerups, action.x, action.y) then
+			settings.powerups = not settings.powerups
+			if settings.powerups then
+				gui.play_flipbook(btn.powerups, "yes")
+				gui.set_color(lbl.powerups_secret, vmath.vector4(1, 1, 1, 1))
+				gui.set_color(btn.powerups_secret, vmath.vector4(1, 1, 1, 1))
+			else
+				gui.play_flipbook(btn.powerups, "no")
+				gui.set_color(lbl.powerups_secret, vmath.vector4(1, 1, 1, 0.1))
+				gui.set_color(btn.powerups_secret, vmath.vector4(1, 1, 1, 0.1))
+			end
+		elseif gui.pick_node(btn.powerups_secret, action.x, action.y) and settings.powerups then
+			settings.powerups_secret = not settings.powerups_secret
+			if settings.powerups_secret then
+				gui.play_flipbook(btn.powerups_secret, "yes")
+			else
+				gui.play_flipbook(btn.powerups_secret, "no")
+			end
+		elseif gui.pick_node(btn.curses, action.x, action.y) then
+			settings.curses = not settings.curses
+			if settings.curses then
+				gui.play_flipbook(btn.curses, "yes")
+				gui.set_color(lbl.curses_secret, vmath.vector4(1, 1, 1, 1))
+				gui.set_color(btn.curses_secret, vmath.vector4(1, 1, 1, 1))
+			else
+				gui.play_flipbook(btn.curses, "no")
+				gui.set_color(lbl.curses_secret, vmath.vector4(1, 1, 1, 0.1))
+				gui.set_color(btn.curses_secret, vmath.vector4(1, 1, 1, 0.1))
+			end
+		elseif gui.pick_node(btn.curses_secret, action.x, action.y) and settings.curses then
+			settings.curses_secret = not settings.curses_secret
+			if settings.curses_secret then
+				gui.play_flipbook(btn.curses_secret, "yes")
+			else
+				gui.play_flipbook(btn.curses_secret, "no")
+			end
+		end
+	elseif action_id == hash("space") then
+		msg.post(msg.url("bootstrap:/go"), "start")
+	end
+end

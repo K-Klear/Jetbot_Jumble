@@ -1,0 +1,31 @@
+local loaded = {}
+
+function init(self)
+	msg.post("@render:", "use_fixed_fit_projection", {near = -1, far = 1})
+	msg.post("#load_menu", "load")
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("proxy_loaded") then
+		msg.post(sender, "init")
+		msg.post(sender, "enable")
+		msg.post(sender, "acquire_input_focus")
+		if sender == msg.url("bootstrap:/go#load_main") then
+			loaded.main = true
+			if loaded.menu then
+				loaded.menu = false
+				msg.post("#load_menu", "unload")
+			end
+		elseif sender == msg.url("bootstrap:/go#load_menu") then
+			loaded.menu = true
+			if loaded.main then
+				loaded.main = false
+				msg.post("#load_main", "unload")
+			end
+		end
+	elseif message_id == hash("start") then
+		msg.post("#load_main", "load")
+	elseif message_id == hash("end") then
+		msg.post("#load_menu", "load")
+	end
+end

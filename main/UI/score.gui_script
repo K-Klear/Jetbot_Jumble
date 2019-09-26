@@ -1,5 +1,6 @@
 local score = {0, 0}
 local buttons = {}
+local settings = require("main/game_settings")
 
 function init(self)
 	buttons.p1_left = gui.get_node("button_player1_left")
@@ -14,6 +15,9 @@ function on_message(self, message_id, message, sender)
 	if message_id == hash("death") then
 		score[message.player] = score[message.player] + 1
 		gui.set_text(gui.get_node("score_"..message.player), score[message.player])
+		if score[message.player] >= settings.max_score then
+			msg.post(msg.url("bootstrap:/go"), "end")
+		end
 	elseif message_id == hash("button_state") then
 		if message.state then
 			gui.set_color(buttons[message.button], vmath.vector4(1, 1, 1, 1))

@@ -22,6 +22,10 @@ key_trigger {
   input: KEY_D
   action: "p2_right"
 }
+key_trigger {
+  input: KEY_SPACE
+  action: "space"
+}
 mouse_trigger {
   input: MOUSE_BUTTON_1
   action: "click"

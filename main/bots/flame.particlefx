@@ -22,7 +22,7 @@ emitters {
   inherit_velocity: 1.0
   max_particle_count: 128
   type: EMITTER_TYPE_BOX
-  start_delay: 0.0
+  start_delay: 0.25
   properties {
     key: EMITTER_KEY_SPAWN_RATE
     points {

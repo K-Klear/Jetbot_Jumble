@@ -1,0 +1,12 @@
+images {
+  image: "/assets/fonts/arrow.png"
+}
+images {
+  image: "/assets/fonts/no.png"
+}
+images {
+  image: "/assets/fonts/yes.png"
+}
+margin: 1
+extrude_borders: 0
+inner_padding: 1
