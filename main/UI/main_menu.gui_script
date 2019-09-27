@@ -1,6 +1,20 @@
 local settings = require("main/game_settings")
 
-local btn, lbl
+local btn, lbl, tool
+local colour = {
+	disabled = vmath.vector4(1, 1, 1, 0.1),
+	enabled = vmath.vector4(1, 1, 1, 1)
+}
+local tooltip = {
+	score = "The first player to reach this score wins.",
+	powerups = "If enabled, helpful powerups will randomly appear in the arena.\n\nIf set to secret, their effect will only be revealed on pickup.",
+	curses = "If enabled, detrimental curses will randomly appear in the arena.\n\nIf set to secret, their effect will only be revealed on pickup.\n\nYou can choose if curses affect the player who picked them up, the enemy, or both.",
+	shackle = "Bots are connected by a chain or an elastic rope of the specified lenght.\n\nIncreased jet power recommended.",
+	tooltips = "No! Please don't! I'm just trying to be helpful! NOOOO!!!"
+}
+
+local tooltip_lbl
+local tooltip_box
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
@@ -12,22 +26,39 @@ function init(self)
 		powerups_secret = gui.get_node("powerups_secret_box"),
 		curses = gui.get_node("curses_box"),
 		curses_secret = gui.get_node("curses_secret_box"),
+		curses_affect = gui.get_node("curses_affect_val"),
+		shackle = gui.get_node("shackle_type_btn"),
+		shackle_up = gui.get_node("shackle_length_up"),
+		shackle_down = gui.get_node("shackle_length_down"),
+		tooltips = gui.get_node("tooltips_box"),
 	}
 	lbl = {
 		score = gui.get_node("score_val"),
 		powerups_secret = gui.get_node("powerups_secret_lbl"),
 		curses_secret = gui.get_node("curses_secret_lbl"),
+		curses_affect = gui.get_node("curses_affect_lbl"),
+		shackle_length = gui.get_node("shackle_length_val"),
+		shackle_length_label = gui.get_node("shackle_length_lbl")
 	}
+	tool = {
+		score = gui.get_node("tool_score"),
+		powerups = gui.get_node("tool_powerups"),
+		curses = gui.get_node("tool_curses"),
+		shackle = gui.get_node("tool_shackle"),
+		tooltips = gui.get_node("tool_tooltips"),
+	}
+	tooltip_lbl = gui.get_node("tooltip_lbl")
+	tooltip_box = gui.get_node("tooltip_box")
 	
 	gui.set_text(lbl.score, settings.max_score)
 	if settings.powerups then
 		gui.play_flipbook(btn.powerups, "yes")
-		gui.set_color(lbl.powerups_secret, vmath.vector4(1, 1, 1, 1))
-		gui.set_color(btn.powerups_secret, vmath.vector4(1, 1, 1, 1))
+		gui.set_color(lbl.powerups_secret, colour.enabled)
+		gui.set_color(btn.powerups_secret, colour.enabled)
 	else
 		gui.play_flipbook(btn.powerups, "no")
-		gui.set_color(lbl.powerups_secret, vmath.vector4(1, 1, 1, 0.1))
-		gui.set_color(btn.powerups_secret, vmath.vector4(1, 1, 1, 0.1))
+		gui.set_color(lbl.powerups_secret, colour.disabled)
+		gui.set_color(btn.powerups_secret, colour.disabled)
 	end
 	if settings.powerups_secret then
 		gui.play_flipbook(btn.powerups_secret, "yes")
@@ -36,17 +67,40 @@ function init(self)
 	end
 	if settings.curses then
 		gui.play_flipbook(btn.curses, "yes")
-		gui.set_color(lbl.curses_secret, vmath.vector4(1, 1, 1, 1))
-		gui.set_color(btn.curses_secret, vmath.vector4(1, 1, 1, 1))
+		gui.set_color(lbl.curses_secret, colour.enabled)
+		gui.set_color(btn.curses_secret, colour.enabled)
+		gui.set_color(lbl.curses_affect, colour.enabled)
+		gui.set_color(btn.curses_affect, colour.enabled)
 	else
 		gui.play_flipbook(btn.curses, "no")
-		gui.set_color(lbl.curses_secret, vmath.vector4(1, 1, 1, 0.1))
-		gui.set_color(btn.curses_secret, vmath.vector4(1, 1, 1, 0.1))
+		gui.set_color(lbl.curses_secret, colour.disabled)
+		gui.set_color(btn.curses_secret, colour.disabled)
+		gui.set_color(lbl.curses_affect, colour.disabled)
+		gui.set_color(btn.curses_affect, colour.disabled)
 	end
 	if settings.curses_secret then
 		gui.play_flipbook(btn.curses_secret, "yes")
 	else
 		gui.play_flipbook(btn.curses_secret, "no")
+	end
+	gui.set_text(btn.curses_affect, settings.curses_affect)
+	gui.set_text(btn.shackle, settings.chain_type)
+	if settings.chain_type == "NONE" then
+		gui.set_color(lbl.shackle_length, colour.disabled)
+		gui.set_color(lbl.shackle_length_label, colour.disabled)
+		gui.set_color(btn.shackle_up, colour.disabled)
+		gui.set_color(btn.shackle_down, colour.disabled)
+	else
+		gui.set_color(lbl.shackle_length, colour.enabled)
+		gui.set_color(lbl.shackle_length_label, colour.enabled)
+		gui.set_color(btn.shackle_up, colour.enabled)
+		gui.set_color(btn.shackle_down, colour.enabled)
+	end
+	gui.set_text(lbl.shackle_length, settings.chain_length)
+	if settings.tooltips then
+		gui.play_flipbook(btn.tooltips, "yes")
+	else
+		gui.play_flipbook(btn.tooltips, "no")
 	end
 end
 
@@ -68,12 +122,12 @@ function on_input(self, action_id, action)
 			settings.powerups = not settings.powerups
 			if settings.powerups then
 				gui.play_flipbook(btn.powerups, "yes")
-				gui.set_color(lbl.powerups_secret, vmath.vector4(1, 1, 1, 1))
-				gui.set_color(btn.powerups_secret, vmath.vector4(1, 1, 1, 1))
+				gui.set_color(lbl.powerups_secret, colour.enabled)
+				gui.set_color(btn.powerups_secret, colour.enabled)
 			else
 				gui.play_flipbook(btn.powerups, "no")
-				gui.set_color(lbl.powerups_secret, vmath.vector4(1, 1, 1, 0.1))
-				gui.set_color(btn.powerups_secret, vmath.vector4(1, 1, 1, 0.1))
+				gui.set_color(lbl.powerups_secret, colour.disabled)
+				gui.set_color(btn.powerups_secret, colour.disabled)
 			end
 		elseif gui.pick_node(btn.powerups_secret, action.x, action.y) and settings.powerups then
 			settings.powerups_secret = not settings.powerups_secret
@@ -86,12 +140,16 @@ function on_input(self, action_id, action)
 			settings.curses = not settings.curses
 			if settings.curses then
 				gui.play_flipbook(btn.curses, "yes")
-				gui.set_color(lbl.curses_secret, vmath.vector4(1, 1, 1, 1))
-				gui.set_color(btn.curses_secret, vmath.vector4(1, 1, 1, 1))
+				gui.set_color(lbl.curses_secret, colour.enabled)
+				gui.set_color(btn.curses_secret, colour.enabled)
+				gui.set_color(lbl.curses_affect, colour.enabled)
+				gui.set_color(btn.curses_affect, colour.enabled)
 			else
 				gui.play_flipbook(btn.curses, "no")
-				gui.set_color(lbl.curses_secret, vmath.vector4(1, 1, 1, 0.1))
-				gui.set_color(btn.curses_secret, vmath.vector4(1, 1, 1, 0.1))
+				gui.set_color(lbl.curses_secret, colour.disabled)
+				gui.set_color(btn.curses_secret, colour.disabled)
+				gui.set_color(lbl.curses_affect, colour.disabled)
+				gui.set_color(btn.curses_affect, colour.disabled)
 			end
 		elseif gui.pick_node(btn.curses_secret, action.x, action.y) and settings.curses then
 			settings.curses_secret = not settings.curses_secret
@@ -100,8 +158,93 @@ function on_input(self, action_id, action)
 			else
 				gui.play_flipbook(btn.curses_secret, "no")
 			end
+		elseif gui.pick_node(btn.curses_affect, action.x, action.y) and settings.curses then
+			if settings.curses_affect == "ENEMY" then
+				settings.curses_affect = "SELF"
+			elseif settings.curses_affect == "SELF" then
+				settings.curses_affect = "BOTH"
+			elseif settings.curses_affect == "BOTH" then
+				settings.curses_affect = "ENEMY"
+			end
+			gui.set_text(btn.curses_affect, settings.curses_affect)
+		elseif gui.pick_node(btn.shackle, action.x, action.y) then
+			if settings.chain_type == "NONE" then
+				settings.chain_type = "CHAIN"
+				gui.set_color(lbl.shackle_length, colour.enabled)
+				gui.set_color(lbl.shackle_length_label, colour.enabled)
+				gui.set_color(btn.shackle_up, colour.enabled)
+				gui.set_color(btn.shackle_down, colour.enabled)
+			elseif settings.chain_type == "CHAIN" then
+				settings.chain_type = "ROPE"
+			elseif settings.chain_type == "ROPE" then
+				settings.chain_type = "NONE"
+				gui.set_color(lbl.shackle_length, colour.disabled)
+				gui.set_color(lbl.shackle_length_label, colour.disabled)
+				gui.set_color(btn.shackle_up, colour.disabled)
+				gui.set_color(btn.shackle_down, colour.disabled)
+			end
+			gui.set_text(btn.shackle, settings.chain_type)
+		elseif gui.pick_node(btn.shackle_up, action.x, action.y) and settings.chain_type ~= "NONE" and settings.chain_length < 70 then
+			settings.chain_length = settings.chain_length + 1
+			gui.set_text(lbl.shackle_length, settings.chain_length)
+		elseif gui.pick_node(btn.shackle_down, action.x, action.y) and settings.chain_type ~= "NONE" and settings.chain_length > 3 then
+			settings.chain_length = settings.chain_length - 1
+			gui.set_text(lbl.shackle_length, settings.chain_length)
+		elseif gui.pick_node(btn.tooltips, action.x, action.y) then
+			settings.tooltips = not settings.tooltips
+			if settings.tooltips then
+				gui.play_flipbook(btn.tooltips, "yes")
+			else
+				gui.play_flipbook(btn.tooltips, "no")
+				gui.set_enabled(tooltip_box, false)
+			end
 		end
 	elseif action_id == hash("space") then
 		msg.post(msg.url("bootstrap:/go"), "start")
+	else
+		if settings.tooltips then
+			local tooltip_text = ""
+			for key, val in pairs(tool) do
+				if gui.pick_node(val, action.x, action.y) then
+					tooltip_text = tooltip[key]
+				end
+			end
+			if tooltip_text == "" then 
+				gui.set_enabled(tooltip_box, false)
+			else
+				gui.set_enabled(tooltip_box, true)
+				gui.set_text(tooltip_lbl, tooltip_text)
+				local matrix = gui.get_text_metrics_from_node(tooltip_lbl)
+				gui.set_size(tooltip_box, vmath.vector3(matrix.width + 20, matrix.height + 20, 0))
+				local pivot
+				local offset
+				local offset_text
+				if action.x + gui.get_size(tooltip_box).x > 1420 then
+					if action.y - gui.get_size(tooltip_box).y < 20 then
+						pivot = gui.PIVOT_SE
+						offset = vmath.vector3(0, 5, 0)
+						offset_text = vmath.vector3(-10, 10, 0)
+					else
+						pivot = gui.PIVOT_NE
+						offset = vmath.vector3(0, -26, 0)
+						offset_text = vmath.vector3(-10, -10, 0)
+					end
+				else
+					if action.y - gui.get_size(tooltip_box).y < 20 then
+						offset = vmath.vector3(0, 5, 0)
+						offset_text = vmath.vector3(10, 10, 0)
+						pivot = gui.PIVOT_SW
+					else
+						pivot = gui.PIVOT_NW
+						offset = vmath.vector3(0, -26, 0)
+						offset_text = vmath.vector3(10, -10, 0)
+					end
+				end
+				gui.set_pivot(tooltip_box, pivot)
+				gui.set_pivot(tooltip_lbl, pivot)
+				gui.set_position(tooltip_box, vmath.vector3(action.x, action.y, 0) + offset)
+				gui.set_position(tooltip_lbl, offset_text)
+			end
+		end
 	end
 end

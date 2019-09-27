@@ -5,8 +5,9 @@ local spawn_location = {vmath.vector3(950, 300, 0), vmath.vector3(450, 300, 0)}
 local gravity = vmath.vector3(0, -75, 0)
 
 local link_hook = vmath.vector3(0, -10, 0)
+local link_hook_chain = vmath.vector3(4, 0, 0)
+local link_hook_rope = vmath.vector3(3, 0, 0)
 
-local chain_length = 15
 local chain_link = {}
 
 local settings = require("main/game_settings")
@@ -14,7 +15,6 @@ local settings = require("main/game_settings")
 
 function init(self)
 	physics.set_gravity(gravity)
-	msg.post("@render:", "use_fixed_fit_projection", {near = -1, far = 1})
 	msg.post(".", "acquire_input_focus")
 	local props = {}
 	props[hash("/body")] = {player = 1}
@@ -22,17 +22,33 @@ function init(self)
 	props[hash("/body")] = {player = 2}
 	jetbot[2] = collectionfactory.create("#spawn_jetbot", spawn_location[2], nil, props, vmath.vector3(0.5, 0.5, 1))
 
-	if chain_length > 1 then
-		chain_link[1] = factory.create("#spawn_chain", vmath.vector3(500, 300, 0), nil, nil, vmath.vector3(0.5, 0.5, 0.5))
+	if settings.chain_type == "CHAIN" then
+		chain_link[1] = factory.create("#spawn_chain", vmath.vector3(720, 360, 0), nil, nil, vmath.vector3(0.5, 0.5, 0.5))
 		local bot_1_co = msg.url(nil, jetbot[1][hash("/body")], "co_body")
 		local bot_2_co = msg.url(nil, jetbot[2][hash("/body")], "co_body")
 		local link_co = msg.url(nil, chain_link[1], "co")
 		physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_2_co, link_hook)
-		for x = 2, chain_length do
-			chain_link[x] = factory.create("#spawn_chain", vmath.vector3(500, 300, 0), nil, nil, vmath.vector3(0.5, 0.5, 0.5))
-			physics.create_joint(physics.JOINT_TYPE_HINGE, msg.url(nil, chain_link[x], "co"), "joint", vmath.vector3(8, 0, 0), msg.url(nil, chain_link[x - 1], "co"), vmath.vector3(-8, 0, 0))
+		for x = 2, settings.chain_length do
+			local properties = {type = 1}
+			local z_pos = 0
+			if x % 2 == 0 then properties = {type = 2}; z_pos = -0.05 end
+			chain_link[x] = factory.create("#spawn_chain", vmath.vector3(720, 360, z_pos), nil, properties, vmath.vector3(0.5, 0.5, 0.5))
+			physics.create_joint(physics.JOINT_TYPE_HINGE, msg.url(nil, chain_link[x], "co"), "joint", link_hook_chain, msg.url(nil, chain_link[x - 1], "co"), vmath.vector3(-8, 0, 0))
 		end
-		link_co = msg.url(nil, chain_link[chain_length], "co")
+		link_co = msg.url(nil, chain_link[settings.chain_length], "co")
+		physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_1_co, link_hook)
+	elseif settings.chain_type == "ROPE" then
+		chain_link[1] = factory.create("#spawn_rope", vmath.vector3(720, 360, 0), nil, nil, vmath.vector3(0.5, 0.5, 0.5))
+		local bot_1_co = msg.url(nil, jetbot[1][hash("/body")], "co_body")
+		local bot_2_co = msg.url(nil, jetbot[2][hash("/body")], "co_body")
+		local link_co = msg.url(nil, chain_link[1], "co")
+		physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_2_co, link_hook)
+		for x = 2, settings.chain_length do
+			chain_link[x] = factory.create("#spawn_rope", vmath.vector3(720, 360, 0), nil, properties, vmath.vector3(0.5, 0.5, 0.5))
+			local props = {length = 0, damping = 0.5, frequency = 2}
+			physics.create_joint(physics.JOINT_TYPE_SPRING, msg.url(nil, chain_link[x], "co"), "joint", link_hook_rope, msg.url(nil, chain_link[x - 1], "co"), vmath.vector3(-8, 0, 0), props)
+		end
+		link_co = msg.url(nil, chain_link[settings.chain_length], "co")
 		physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_1_co, link_hook)
 	end
 end
@@ -116,20 +132,24 @@ local f_respawn = {
 		local props = {}
 		props[hash("/body")] = {player = 1}
 		jetbot[1] = collectionfactory.create("#spawn_jetbot", spawn_location[1], nil, props, vmath.vector3(0.5, 0.5, 1))
-		local bot_co = msg.url(nil, jetbot[1][hash("/body")], "co_body")
-		local link_co = msg.url(nil, chain_link[chain_length], "co")
-		physics.destroy_joint(link_co, "joint_bot")
-		physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_co, link_hook)
+		if settings.chain_type ~= "NONE" then
+			local bot_co = msg.url(nil, jetbot[1][hash("/body")], "co_body")
+			local link_co = msg.url(nil, chain_link[settings.chain_length], "co")
+			physics.destroy_joint(link_co, "joint_bot")
+			physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_co, link_hook)
+		end
 	end,
 	function ()
 		go.delete(jetbot[2])
 		local props = {}
 		props[hash("/body")] = {player = 2}
 		jetbot[2] = collectionfactory.create("#spawn_jetbot", spawn_location[2], nil, props, vmath.vector3(0.5, 0.5, 1))
-		local bot_co = msg.url(nil, jetbot[2][hash("/body")], "co_body")
-		local link_co = msg.url(nil, chain_link[1], "co")
-		physics.destroy_joint(link_co, "joint_bot")
-		physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_co, link_hook)
+		if settings.chain_type ~= "NONE" then
+			local bot_co = msg.url(nil, jetbot[2][hash("/body")], "co_body")
+			local link_co = msg.url(nil, chain_link[1], "co")
+			physics.destroy_joint(link_co, "joint_bot")
+			physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_co, link_hook)
+		end
 	end
 }
 
