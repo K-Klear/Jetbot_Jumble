@@ -1828,7 +1828,6 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
 }
-<<<<<<< HEAD
 nodes {
   position {
     x: 76.0
@@ -2115,8 +2114,6 @@ nodes {
   template_node_child: false
   size_mode: SIZE_MODE_MANUAL
 }
-=======
->>>>>>> 23aebf781fe9525491fc0664308399010b62826c
 material: "/builtins/materials/gui.material"
 adjust_reference: ADJUST_REFERENCE_PARENT
 max_nodes: 512
