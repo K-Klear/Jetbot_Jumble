@@ -10,7 +10,8 @@ local tooltip = {
 	powerups = "If enabled, helpful powerups will randomly appear in the arena.\n\nIf set to secret, their effect will only be revealed on pickup.",
 	curses = "If enabled, detrimental curses will randomly appear in the arena.\n\nIf set to secret, their effect will only be revealed on pickup.\n\nYou can choose if curses affect the player who picked them up, the enemy, or both.",
 	shackle = "Bots are connected by a chain or an elastic rope of the specified lenght.\n\nIncreased jet power recommended.",
-	tooltips = "No! Please don't! I'm just trying to be helpful! NOOOO!!!"
+	tooltips = "No! Please don't! I'm just trying to be helpful! NOOOO!!!",
+	gravity = "You might want to increase jet power along with this."
 }
 
 local tooltip_lbl
@@ -31,6 +32,8 @@ function init(self)
 		shackle_up = gui.get_node("shackle_length_up"),
 		shackle_down = gui.get_node("shackle_length_down"),
 		tooltips = gui.get_node("tooltips_box"),
+		gravity_up = gui.get_node("gravity_arrow_up"),
+		gravity_down = gui.get_node("gravity_arrow_down"),
 	}
 	lbl = {
 		score = gui.get_node("score_val"),
@@ -38,7 +41,8 @@ function init(self)
 		curses_secret = gui.get_node("curses_secret_lbl"),
 		curses_affect = gui.get_node("curses_affect_lbl"),
 		shackle_length = gui.get_node("shackle_length_val"),
-		shackle_length_label = gui.get_node("shackle_length_lbl")
+		shackle_length_label = gui.get_node("shackle_length_lbl"),
+		gravity = gui.get_node("gravity_val")
 	}
 	tool = {
 		score = gui.get_node("tool_score"),
@@ -46,6 +50,7 @@ function init(self)
 		curses = gui.get_node("tool_curses"),
 		shackle = gui.get_node("tool_shackle"),
 		tooltips = gui.get_node("tool_tooltips"),
+		gravity = gui.get_node("tool_gravity")
 	}
 	tooltip_lbl = gui.get_node("tooltip_lbl")
 	tooltip_box = gui.get_node("tooltip_box")
@@ -102,6 +107,7 @@ function init(self)
 	else
 		gui.play_flipbook(btn.tooltips, "no")
 	end
+	gui.set_text(lbl.gravity, settings.gravity)
 end
 
 function on_message(self, message_id, message, sender)
@@ -198,6 +204,12 @@ function on_input(self, action_id, action)
 				gui.play_flipbook(btn.tooltips, "no")
 				gui.set_enabled(tooltip_box, false)
 			end
+		elseif gui.pick_node(btn.gravity_up, action.x, action.y) and settings.gravity < 50 then
+			settings.gravity = settings.gravity + 1
+			gui.set_text(lbl.gravity, settings.gravity)
+		elseif gui.pick_node(btn.gravity_down, action.x, action.y) and settings.gravity > 0 then
+			settings.gravity = settings.gravity - 1
+			gui.set_text(lbl.gravity, settings.gravity)
 		end
 	elseif action_id == hash("space") then
 		msg.post(msg.url("bootstrap:/go"), "start")

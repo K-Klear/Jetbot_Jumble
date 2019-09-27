@@ -2,8 +2,6 @@ local respawn_time = 3
 local jetbot = {}
 local spawn_location = {vmath.vector3(950, 300, 0), vmath.vector3(450, 300, 0)}
 
-local gravity = vmath.vector3(0, -75, 0)
-
 local link_hook = vmath.vector3(0, -10, 0)
 local link_hook_chain = vmath.vector3(6, 0, 0)
 local link_hook_chain2 = vmath.vector3(-6, 0, 0)
@@ -15,7 +13,7 @@ local chain_link = {}
 local settings = require("main/game_settings")
 
 function init(self)
-	physics.set_gravity(gravity)
+	physics.set_gravity(vmath.vector3(0, settings.gravity * -7.5, 0))
 	msg.post(".", "acquire_input_focus")
 	local props = {}
 	props[hash("/body")] = {player = 1}

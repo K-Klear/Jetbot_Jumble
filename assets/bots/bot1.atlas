@@ -14,5 +14,5 @@ images {
   image: "/assets/bots/jet2.png"
 }
 margin: 1
-extrude_borders: 0
+extrude_borders: 1
 inner_padding: 1
