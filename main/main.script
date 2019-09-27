@@ -5,10 +5,15 @@ local spawn_location = {vmath.vector3(950, 300, 0), vmath.vector3(450, 300, 0)}
 local gravity = vmath.vector3(0, -75, 0)
 
 local link_hook = vmath.vector3(0, -10, 0)
+<<<<<<< HEAD
 local link_hook_chain = vmath.vector3(6, 0, 0)
 local link_hook_chain2 = vmath.vector3(-6, 0, 0)
 local link_hook_rope = vmath.vector3(3, 0, 0)
 local link_hook_rope2 = vmath.vector3(-3, 0, 0)
+=======
+local link_hook_chain = vmath.vector3(4, 0, 0)
+local link_hook_rope = vmath.vector3(3, 0, 0)
+>>>>>>> 23aebf781fe9525491fc0664308399010b62826c
 
 local chain_link = {}
 
@@ -25,6 +30,7 @@ function init(self)
 
 	if settings.chain_type == "CHAIN" then
 		chain_link[1] = factory.create("#spawn_chain", vmath.vector3(720, 360, 0), nil, nil, vmath.vector3(0.5, 0.5, 0.5))
+<<<<<<< HEAD
 		local bot_1_co = msg.url(nil, jetbot[1][hash("/body")], "co_body")
 		local bot_2_co = msg.url(nil, jetbot[2][hash("/body")], "co_body")
 		local link_co = msg.url(nil, chain_link[1], "co")
@@ -40,17 +46,42 @@ function init(self)
 		physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_1_co, link_hook)
 	elseif settings.chain_type == "ROPE" then
 		chain_link[1] = factory.create("#spawn_rope", vmath.vector3(720, 360, 0), nil, nil, vmath.vector3(0.5, 0.5, 0.5))
+=======
+>>>>>>> 23aebf781fe9525491fc0664308399010b62826c
 		local bot_1_co = msg.url(nil, jetbot[1][hash("/body")], "co_body")
 		local bot_2_co = msg.url(nil, jetbot[2][hash("/body")], "co_body")
 		local link_co = msg.url(nil, chain_link[1], "co")
 		physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_2_co, link_hook)
 		for x = 2, settings.chain_length do
+<<<<<<< HEAD
 			chain_link[x] = factory.create("#spawn_rope", vmath.vector3(720, 360, 0), nil, properties, vmath.vector3(0.5, 0.5, 0.5))
 			if x < settings.chain_length then msg.post(chain_link[x], "middle", {next = msg.url(nil, chain_link[x - 1], "co")}) end
 			local props = {length = 0, damping = 0.5, frequency = 7}
 			physics.create_joint(physics.JOINT_TYPE_SPRING, msg.url(nil, chain_link[x], "co"), "joint", link_hook_rope, msg.url(nil, chain_link[x - 1], "co"), link_hook_rope2, props)
 		end
 		link_co = msg.url(nil, chain_link[settings.chain_length], "co")
+=======
+			local properties = {type = 1}
+			local z_pos = 0
+			if x % 2 == 0 then properties = {type = 2}; z_pos = -0.05 end
+			chain_link[x] = factory.create("#spawn_chain", vmath.vector3(720, 360, z_pos), nil, properties, vmath.vector3(0.5, 0.5, 0.5))
+			physics.create_joint(physics.JOINT_TYPE_HINGE, msg.url(nil, chain_link[x], "co"), "joint", link_hook_chain, msg.url(nil, chain_link[x - 1], "co"), vmath.vector3(-8, 0, 0))
+		end
+		link_co = msg.url(nil, chain_link[settings.chain_length], "co")
+		physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_1_co, link_hook)
+	elseif settings.chain_type == "ROPE" then
+		chain_link[1] = factory.create("#spawn_rope", vmath.vector3(720, 360, 0), nil, nil, vmath.vector3(0.5, 0.5, 0.5))
+		local bot_1_co = msg.url(nil, jetbot[1][hash("/body")], "co_body")
+		local bot_2_co = msg.url(nil, jetbot[2][hash("/body")], "co_body")
+		local link_co = msg.url(nil, chain_link[1], "co")
+		physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_2_co, link_hook)
+		for x = 2, settings.chain_length do
+			chain_link[x] = factory.create("#spawn_rope", vmath.vector3(720, 360, 0), nil, properties, vmath.vector3(0.5, 0.5, 0.5))
+			local props = {length = 0, damping = 0.5, frequency = 2}
+			physics.create_joint(physics.JOINT_TYPE_SPRING, msg.url(nil, chain_link[x], "co"), "joint", link_hook_rope, msg.url(nil, chain_link[x - 1], "co"), vmath.vector3(-8, 0, 0), props)
+		end
+		link_co = msg.url(nil, chain_link[settings.chain_length], "co")
+>>>>>>> 23aebf781fe9525491fc0664308399010b62826c
 		physics.create_joint(physics.JOINT_TYPE_HINGE, link_co, "joint_bot", vmath.vector3(0, 0, 0), bot_1_co, link_hook)
 	end
 end

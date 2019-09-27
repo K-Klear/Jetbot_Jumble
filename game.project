@@ -65,5 +65,8 @@ scale = 0.01
 debug = 0
 debug_alpha = 0.5
 max_collisions = 256
+<<<<<<< HEAD
 gravity_x = 0.0
+=======
+>>>>>>> 23aebf781fe9525491fc0664308399010b62826c
 

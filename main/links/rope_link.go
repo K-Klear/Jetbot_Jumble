@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 components {
   id: "rope_script"
   component: "/main/links/rope_script.script"
@@ -13,6 +14,8 @@ components {
     w: 1.0
   }
 }
+=======
+>>>>>>> 23aebf781fe9525491fc0664308399010b62826c
 embedded_components {
   id: "sprite"
   type: "sprite"
@@ -38,7 +41,11 @@ embedded_components {
   type: "collisionobject"
   data: "collision_shape: \"\"\n"
   "type: COLLISION_OBJECT_TYPE_DYNAMIC\n"
+<<<<<<< HEAD
   "mass: 0.15\n"
+=======
+  "mass: 0.1\n"
+>>>>>>> 23aebf781fe9525491fc0664308399010b62826c
   "friction: 0.1\n"
   "restitution: 0.7\n"
   "group: \"chain\"\n"
@@ -61,12 +68,21 @@ embedded_components {
   "    index: 0\n"
   "    count: 3\n"
   "  }\n"
+<<<<<<< HEAD
   "  data: 15.0\n"
   "  data: 4.0\n"
   "  data: 10.0\n"
   "}\n"
   "linear_damping: 0.7\n"
   "angular_damping: 1.0\n"
+=======
+  "  data: 15.9295\n"
+  "  data: 4.041\n"
+  "  data: 10.0\n"
+  "}\n"
+  "linear_damping: 0.0\n"
+  "angular_damping: 0.0\n"
+>>>>>>> 23aebf781fe9525491fc0664308399010b62826c
   "locked_rotation: false\n"
   ""
   position {
