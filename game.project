@@ -60,8 +60,10 @@ immersive_mode = 1
 shared_state = 1
 
 [physics]
-gravity_y = -150.0
+gravity_y = 0.0
 scale = 0.01
 debug = 0
 debug_alpha = 0.5
+max_collisions = 256
+gravity_x = 0.0
 

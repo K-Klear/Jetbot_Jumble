@@ -2,6 +2,9 @@ local score = {0, 0}
 local buttons = {}
 local settings = require("main/game_settings")
 
+local death_timer = {}
+local bot_alive = {true, true}
+
 function init(self)
 	buttons.p1_left = gui.get_node("button_player1_left")
 	buttons.p1_right = gui.get_node("button_player1_right")
@@ -13,10 +16,14 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("death") then
-		score[message.player] = score[message.player] + 1
-		gui.set_text(gui.get_node("score_"..message.player), score[message.player])
-		if score[message.player] >= settings.max_score then
-			msg.post(msg.url("bootstrap:/go"), "end")
+		if bot_alive[message.player] then	-- this prevents the double score bug, but there should be a better way
+			bot_alive[message.player] = false
+			score[message.player] = score[message.player] + 1
+			gui.set_text(gui.get_node("score_"..message.player), score[message.player])
+			if score[message.player] >= settings.max_score then
+				msg.post(msg.url("bootstrap:/go"), "end")
+			end
+			timer.delay(1, false, function() bot_alive[message.player] = true end)
 		end
 	elseif message_id == hash("button_state") then
 		if message.state then

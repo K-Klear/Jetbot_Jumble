@@ -1,0 +1,25 @@
+
+
+function init(self)
+	
+end
+
+function update(self, dt)
+	if self.next then
+		local vector_self = go.get_position(".")
+		local vector_next = go.get_position(self.next)
+		local dx = vector_self.x - vector_next.x
+		local dy = vector_self.y - vector_next.y
+		local dist = math.sqrt(dx * dx + dy * dy) / 7.4
+		if vector.x == vector.x then
+			go.animate(".", "scale.x", go.PLAYBACK_NONE, dist * 0.5, go.EASING_LINEAR, 0)
+			local props = {length = 1, damping = 0.5, frequency = 10}
+		end
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("middle") then
+		self.next = message.next
+	end
+end

@@ -1,3 +1,8 @@
+Notes:
+
+- make shackles spawn more sensibly
+- look into a better solution 
+
 Fonts used:
 
 https://www.dafont.com/cf-i-robot.font
