@@ -3,6 +3,14 @@ Notes:
 - make shackles spawn more sensibly
 - look into a better solution 
 
+Ideas for special modes:
+- Sumo (high gravity, spikes from sides, short chain)
+- Sumo isometric (zero-G, spikes everywhere, short chain)
+- Tumbler arena with "rotating" gravity
+- Pickup race - points gained by picking up powerups, no death
+- Limited fuel
+
+
 Fonts used:
 
 https://www.dafont.com/cf-i-robot.font

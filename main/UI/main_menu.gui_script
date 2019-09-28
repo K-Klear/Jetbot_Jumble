@@ -11,7 +11,8 @@ local tooltip = {
 	curses = "If enabled, detrimental curses will randomly appear in the arena.\n\nIf set to secret, their effect will only be revealed on pickup.\n\nYou can choose if curses affect the player who picked them up, the enemy, or both.",
 	shackle = "Bots are connected by a chain or an elastic rope of the specified lenght.\n\nIncreased jet power recommended.",
 	tooltips = "No! Please don't! I'm just trying to be helpful! NOOOO!!!",
-	gravity = "You might want to increase jet power along with this."
+	gravity = "You might want to compensate for the added weight of the chain with an increase in jet power.",
+	jet_power = "Typically you want set the upper jets to a slightly higher number, since the lower jets work in unison."
 }
 
 local tooltip_lbl
@@ -34,6 +35,10 @@ function init(self)
 		tooltips = gui.get_node("tooltips_box"),
 		gravity_up = gui.get_node("gravity_arrow_up"),
 		gravity_down = gui.get_node("gravity_arrow_down"),
+		jet_power_upper_up = gui.get_node("jet_power_upper_arrow_up"),
+		jet_power_upper_down = gui.get_node("jet_power_upper_arrow_down"),
+		jet_power_lower_up = gui.get_node("jet_power_lower_arrow_up"),
+		jet_power_lower_down = gui.get_node("jet_power_lower_arrow_down"),
 	}
 	lbl = {
 		score = gui.get_node("score_val"),
@@ -42,7 +47,9 @@ function init(self)
 		curses_affect = gui.get_node("curses_affect_lbl"),
 		shackle_length = gui.get_node("shackle_length_val"),
 		shackle_length_label = gui.get_node("shackle_length_lbl"),
-		gravity = gui.get_node("gravity_val")
+		gravity = gui.get_node("gravity_val"),
+		jet_power_upper = gui.get_node("jet_power_upper_val"),
+		jet_power_lower = gui.get_node("jet_power_lower_val"),
 	}
 	tool = {
 		score = gui.get_node("tool_score"),
@@ -50,7 +57,8 @@ function init(self)
 		curses = gui.get_node("tool_curses"),
 		shackle = gui.get_node("tool_shackle"),
 		tooltips = gui.get_node("tool_tooltips"),
-		gravity = gui.get_node("tool_gravity")
+		gravity = gui.get_node("tool_gravity"),
+		jet_power = gui.get_node("tool_jet_power")
 	}
 	tooltip_lbl = gui.get_node("tooltip_lbl")
 	tooltip_box = gui.get_node("tooltip_box")
@@ -108,6 +116,8 @@ function init(self)
 		gui.play_flipbook(btn.tooltips, "no")
 	end
 	gui.set_text(lbl.gravity, settings.gravity)
+	gui.set_text(lbl.jet_power_upper, settings.jet_power_upper)
+	gui.set_text(lbl.jet_power_lower, settings.jet_power_lower)
 end
 
 function on_message(self, message_id, message, sender)
@@ -190,7 +200,7 @@ function on_input(self, action_id, action)
 				gui.set_color(btn.shackle_down, colour.disabled)
 			end
 			gui.set_text(btn.shackle, settings.chain_type)
-		elseif gui.pick_node(btn.shackle_up, action.x, action.y) and settings.chain_type ~= "NONE" and settings.chain_length < 70 then
+		elseif gui.pick_node(btn.shackle_up, action.x, action.y) and settings.chain_type ~= "NONE" and settings.chain_length < 50 then
 			settings.chain_length = settings.chain_length + 1
 			gui.set_text(lbl.shackle_length, settings.chain_length)
 		elseif gui.pick_node(btn.shackle_down, action.x, action.y) and settings.chain_type ~= "NONE" and settings.chain_length > 3 then
@@ -210,6 +220,18 @@ function on_input(self, action_id, action)
 		elseif gui.pick_node(btn.gravity_down, action.x, action.y) and settings.gravity > 0 then
 			settings.gravity = settings.gravity - 1
 			gui.set_text(lbl.gravity, settings.gravity)
+		elseif gui.pick_node(btn.jet_power_upper_up, action.x, action.y) and settings.jet_power_upper < 5000 then
+			settings.jet_power_upper = settings.jet_power_upper + 250
+			gui.set_text(lbl.jet_power_upper, settings.jet_power_upper)
+		elseif gui.pick_node(btn.jet_power_upper_down, action.x, action.y) and settings.jet_power_upper > 250 then
+			settings.jet_power_upper = settings.jet_power_upper - 250
+			gui.set_text(lbl.jet_power_upper, settings.jet_power_upper)
+		elseif gui.pick_node(btn.jet_power_lower_up, action.x, action.y) and settings.jet_power_lower < 5000 then
+			settings.jet_power_lower = settings.jet_power_lower + 250
+			gui.set_text(lbl.jet_power_lower, settings.jet_power_lower)
+		elseif gui.pick_node(btn.jet_power_lower_down, action.x, action.y) and settings.jet_power_lower > 250 then
+			settings.jet_power_lower = settings.jet_power_lower - 250
+			gui.set_text(lbl.jet_power_lower, settings.jet_power_lower)
 		end
 	elseif action_id == hash("space") then
 		msg.post(msg.url("bootstrap:/go"), "start")

@@ -28,6 +28,21 @@ components {
     w: 1.0
   }
 }
+components {
+  id: "flame_boosted"
+  component: "/main/bots/flame_boosted.particlefx"
+  position {
+    x: 0.0
+    y: -35.0
+    z: -1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
 embedded_components {
   id: "co"
   type: "collisionobject"

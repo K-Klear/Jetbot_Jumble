@@ -1,39 +1,38 @@
+local settings = require("main/game_settings")
+
 go.property("player", 1)
 go.property("up", 1)
 go.property("left", 1)
 go.property("right", 1)
-go.property("jet_top_left", false)
-go.property("jet_top_right", false)
-go.property("jet_bottom_left", false)
-go.property("jet_bottom_right", false)
-go.property("key_pressed_left", false)
-go.property("key_pressed_right", false)
-go.property("key_pressed_up", false)
-go.property("alive", true)
 
-local jet_strength_multiplier = 1
 
-local jet_strength = {
-	jet_bottom_left = 1000 * jet_strength_multiplier,
-	jet_bottom_right = 1000 * jet_strength_multiplier,
-	jet_top_right = 1250 * jet_strength_multiplier,
-	jet_top_left = 1250 * jet_strength_multiplier
+local jet_power = {
+	jet_bottom_left = settings.jet_power_lower,
+	jet_bottom_right = settings.jet_power_lower,
+	jet_top_right = settings.jet_power_upper,
+	jet_top_left = settings.jet_power_upper,
 }
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
 	physics.create_joint(physics.JOINT_TYPE_HINGE, "body#co_head", "joint", vmath.vector3(0, 0, 0), "body#co_body", vmath.vector3(0, 0, 0),
 	{upper_angle = math.rad(0), lower_angle = math.rad(0), enable_limit = true})
-	
 	physics.create_joint(physics.JOINT_TYPE_HINGE, "jet_bottom_left#co", "joint", vmath.vector3(0, 0, 0), "body#co_body", vmath.vector3(-15, -30, 0),
 	{upper_angle = math.rad(45), lower_angle = math.rad(45), enable_limit = true})
-	
 	physics.create_joint(physics.JOINT_TYPE_HINGE, "jet_bottom_right#co", "joint", vmath.vector3(0, 0, 0), "body#co_body", vmath.vector3(15, -30, 0),
 	{upper_angle = math.rad(-45), lower_angle = math.rad(-45), enable_limit = true})
 	physics.create_joint(physics.JOINT_TYPE_HINGE, "jet_top_left#co", "joint", vmath.vector3(0, 0, 0), "body#co_body", vmath.vector3(-20, 0, 0),
 	{upper_angle = math.rad(120), lower_angle = math.rad(120), enable_limit = true})
 	physics.create_joint(physics.JOINT_TYPE_HINGE, "jet_top_right#co", "joint", vmath.vector3(0, 0, 0), "body#co_body", vmath.vector3(20, 0, 0),
 	{upper_angle = math.rad(-120), lower_angle = math.rad(-120), enable_limit = true})
+	self.alive = true
+	self.jet_type = "#flame"
+	self.jet_top_left = false
+	self.jet_top_right = false
+	self.jet_bottom_left = false
+	self.jet_bottom_right = false
+	self.jets = {jet_top_left = self.jet_top_left, jet_top_right = self.jet_top_right, jet_bottom_left = self.jet_bottom_left, jet_bottom_right = self.jet_bottom_right}
+	self.jet_power_multiplier = 1
 	if self.player == 1 then
 		self.up = hash("p1_up")
 		self.left = hash("p1_left")
@@ -55,11 +54,12 @@ local function die(self)
 	self.key_pressed_left = false
 	self.key_pressed_right = false
 	self.key_pressed_up = false
-	msg.post(".", "release_input_focus")
-	particlefx.stop("jet_bottom_left#flame")
-	particlefx.stop("jet_bottom_right#flame")
-	particlefx.stop("jet_top_left#flame")
-	particlefx.stop("jet_top_right#flame")
+	for _jet, val in pairs(self.jets) do
+		particlefx.stop(_jet..self.jet_type)
+		self[_jet] = nil
+	end
+	if self.boost then timer.cancel(self.boost) end
+	self.jet_power_multiplier = 1
 	msg.post(".", "disable")
 	msg.post("/main", "death", {player = self.player})
 	msg.post("jet_bottom_left", "death")
@@ -77,31 +77,58 @@ function on_message(self, message_id, message, sender)
 		self[message.button] = true
 	elseif message_id == hash("death") then
 		die(self)
+	elseif message_id == hash("pickup") then
+		if message.type == hash("jet") then
+			for _jet, val in pairs(self.jets) do
+				particlefx.stop(_jet..self.jet_type)
+				if self[_jet] then
+					particlefx.play(_jet.."#flame_boosted")
+				end
+			end
+			self.jet_type = "#flame_boosted"
+			self.jet_power_multiplier = settings.pickup_boost_multiplier
+			if self.boost then timer.cancel(self.boost) end
+			self.boost = timer.delay(settings.pickup_boost_duration, false, function()
+				for _jet, val in pairs(self.jets) do
+					particlefx.stop(_jet..self.jet_type)
+					if self[_jet] then
+						particlefx.play(_jet.."#flame")
+					end
+				end
+				self.jet_type = "#flame"
+				self.jet_power_multiplier = 1
+				self.boost = nil
+			end)
+		elseif message.type == hash("spin") then
+			msg.post("body#co_body", "apply_force", {force = vmath.vector3(settings.curse_spin_force, 0, 0), position = vmath.vector3(0, 200, 0)})
+			msg.post("body#co_body", "apply_force", {force = vmath.vector3(-settings.curse_spin_force, 0, 0), position = vmath.vector3(0, -200, 0)})
+		else
+			print("Unknown pickup type")
+		end
 	end
 end
 
 function update(self, dt)
 	if self.alive then
-		local jets = {jet_top_left = self.jet_top_left, jet_top_right = self.jet_top_right, jet_bottom_left = self.jet_bottom_left, jet_bottom_right = self.jet_bottom_right}
 		local config = {}
 		if self.key_pressed_left == true then config.jet_top_right = true end
 		if self.key_pressed_right == true then config.jet_top_left = true end
 		if self.key_pressed_up == true then config.jet_bottom_right = true; config.jet_bottom_left = true end
 
-		for active_jet, val in pairs(jets) do
+		for active_jet, val in pairs(self.jets) do
 			if config[active_jet] then
 				if not self[active_jet] then
-					particlefx.play(active_jet.."#flame")
+					particlefx.play(active_jet..self.jet_type)
 					self[active_jet] = true
 				end
 				if self[active_jet] then
-					dir = vmath.rotate(go.get_rotation(active_jet), vmath.vector3(0, jet_strength[active_jet], 0))
+					dir = vmath.rotate(go.get_rotation(active_jet), vmath.vector3(0, jet_power[active_jet] * self.jet_power_multiplier, 0))
 					pos = vmath.rotate(go.get_rotation(active_jet), vmath.vector3(0, 0, 0))
 					msg.post("body#co_body", "apply_force", {force = dir, position = go.get_world_position("body") + pos})
 				end
 			else
 				if self[active_jet] then
-					particlefx.stop(active_jet.."#flame")
+					particlefx.stop(active_jet..self.jet_type)
 					self[active_jet] = false
 				end
 			end
