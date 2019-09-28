@@ -9,7 +9,7 @@ Ideas for special modes:
 - Tumbler arena with "rotating" gravity
 - Pickup race - points gained by picking up powerups, no death
 - Limited fuel
-
+- Madhouse (20 grav, high jet power, short-ish chain, spikes up and bounces elsewhere)
 
 Fonts used:
 

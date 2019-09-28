@@ -56,6 +56,7 @@ embedded_components {
   "mask: \"body\"\n"
   "mask: \"jet\"\n"
   "mask: \"spikes\"\n"
+  "mask: \"bounce\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
   "    shape_type: TYPE_BOX\n"

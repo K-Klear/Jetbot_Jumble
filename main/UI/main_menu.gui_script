@@ -12,11 +12,13 @@ local tooltip = {
 	shackle = "Bots are connected by a chain or an elastic rope of the specified lenght.\n\nIncreased jet power recommended.",
 	tooltips = "No! Please don't! I'm just trying to be helpful! NOOOO!!!",
 	gravity = "You might want to compensate for the added weight of the chain with an increase in jet power.",
-	jet_power = "Typically you want set the upper jets to a slightly higher number, since the lower jets work in unison."
+	jet_power = "Typically you want set the upper jets to a slightly higher number, since the lower jets work in unison.",
+	arena = "Click on the walls to choose between normal walls, bouncy green walls and lethal spikes.",
 }
 
 local tooltip_lbl
 local tooltip_box
+local setup_arena_preview
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
@@ -39,6 +41,10 @@ function init(self)
 		jet_power_upper_down = gui.get_node("jet_power_upper_arrow_down"),
 		jet_power_lower_up = gui.get_node("jet_power_lower_arrow_up"),
 		jet_power_lower_down = gui.get_node("jet_power_lower_arrow_down"),
+		arena_floor = gui.get_node("arena_floor"),
+		arena_ceiling = gui.get_node("arena_ceiling"),
+		arena_wall_left = gui.get_node("arena_wall_left"),
+		arena_wall_right = gui.get_node("arena_wall_right"),
 	}
 	lbl = {
 		score = gui.get_node("score_val"),
@@ -58,7 +64,8 @@ function init(self)
 		shackle = gui.get_node("tool_shackle"),
 		tooltips = gui.get_node("tool_tooltips"),
 		gravity = gui.get_node("tool_gravity"),
-		jet_power = gui.get_node("tool_jet_power")
+		jet_power = gui.get_node("tool_jet_power"),
+		arena = gui.get_node("tool_arena")
 	}
 	tooltip_lbl = gui.get_node("tooltip_lbl")
 	tooltip_box = gui.get_node("tooltip_box")
@@ -118,11 +125,29 @@ function init(self)
 	gui.set_text(lbl.gravity, settings.gravity)
 	gui.set_text(lbl.jet_power_upper, settings.jet_power_upper)
 	gui.set_text(lbl.jet_power_lower, settings.jet_power_lower)
+
+	tilemap.set_tile("/arena_preview#arena_preview", "floor", 0, 0, 0);	tilemap.set_tile("/arena_preview#arena_preview", "floor", 65, 41, 0)
+	setup_arena_preview()
 end
 
-function on_message(self, message_id, message, sender)
+function setup_arena_preview()
+	local tiles = {floor = {spikes = {17, 9, 1}, wall = {3, 3, 3}, bounce = {19, 19, 19}},
+	wall_left = {spikes = {18, 10, 2}, wall = {4, 4, 4}, bounce = {20, 20, 20} },
+	ceiling = {spikes = {41, 33, 25}, wall = {12, 12, 12}, bounce = {28, 28, 28}},
+	wall_right = {spikes = {42, 34, 26}, wall = {11, 11, 11}, bounce = {27, 27, 27}}}
 
+	for y = 1, 3 do
+		for x = 1, 64 do
+			tilemap.set_tile("/arena_preview#arena_preview", "floor", x, y, tiles.floor[settings.arena_floor][y])
+			tilemap.set_tile("/arena_preview#arena_preview", "floor", x, 41 - y, tiles.ceiling[settings.arena_ceiling][y])
+			if x < 41 then
+				tilemap.set_tile("/arena_preview#arena_preview", "walls", y, x, tiles.wall_left[settings.arena_wall_left][y])
+				tilemap.set_tile("/arena_preview#arena_preview", "walls", 65 - y, x, tiles.wall_right[settings.arena_wall_right][y])
+			end
+		end
+	end
 end
+
 
 function on_input(self, action_id, action)
 	if action_id == hash("click") and action.pressed then
@@ -232,6 +257,42 @@ function on_input(self, action_id, action)
 		elseif gui.pick_node(btn.jet_power_lower_down, action.x, action.y) and settings.jet_power_lower > 250 then
 			settings.jet_power_lower = settings.jet_power_lower - 250
 			gui.set_text(lbl.jet_power_lower, settings.jet_power_lower)
+		elseif gui.pick_node(btn.arena_floor, action.x, action.y) then
+			if settings.arena_floor == "spikes" then
+				settings.arena_floor = "wall"
+			elseif settings.arena_floor == "wall" then
+				settings.arena_floor = "bounce"
+			elseif settings.arena_floor == "bounce" then
+				settings.arena_floor = "spikes"
+			end
+			setup_arena_preview()
+		elseif gui.pick_node(btn.arena_ceiling, action.x, action.y) then
+			if settings.arena_ceiling == "spikes" then
+				settings.arena_ceiling = "wall"
+			elseif settings.arena_ceiling == "wall" then
+				settings.arena_ceiling = "bounce"
+			elseif settings.arena_ceiling == "bounce" then
+				settings.arena_ceiling = "spikes"
+			end
+			setup_arena_preview()
+		elseif gui.pick_node(btn.arena_wall_left, action.x, action.y) then
+			if settings.arena_wall_left == "spikes" then
+				settings.arena_wall_left = "wall"
+			elseif settings.arena_wall_left == "wall" then
+				settings.arena_wall_left = "bounce"
+			elseif settings.arena_wall_left == "bounce" then
+				settings.arena_wall_left = "spikes"
+			end
+			setup_arena_preview()
+		elseif gui.pick_node(btn.arena_wall_right, action.x, action.y) then
+			if settings.arena_wall_right == "spikes" then
+				settings.arena_wall_right = "wall"
+			elseif settings.arena_wall_right == "wall" then
+				settings.arena_wall_right = "bounce"
+			elseif settings.arena_wall_right == "bounce" then
+				settings.arena_wall_right = "spikes"
+			end
+			setup_arena_preview()
 		end
 	elseif action_id == hash("space") then
 		msg.post(msg.url("bootstrap:/go"), "start")

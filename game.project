@@ -67,3 +67,6 @@ debug_alpha = 0.5
 max_collisions = 256
 gravity_x = 0.0
 
+[graphics]
+max_debug_vertices = 10000
+

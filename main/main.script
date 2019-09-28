@@ -18,6 +18,7 @@ local chain_link = {}
 
 local settings = require("main/game_settings")
 
+
 local function get_distance(pos1, pos2)
 	local dx = pos1.x - pos2.x
 	local dy = pos1.y - pos2.y
@@ -92,6 +93,51 @@ function init(self)
 	end
 	if settings.powerups or settings.curses then
 		pickup_timer = timer.delay(math.random(settings.pickup_frequency_min, settings.pickup_frequency_max), false, spawn_pickup)
+	end
+	tilemap.set_tile("/floor#floor", "floor", 0, 0, 0)
+	tilemap.set_tile("/floor#floor", "floor", 65, 41, 0)
+	tilemap.set_tile("/ceiling#ceiling", "ceiling", 0, 0, 0)
+	tilemap.set_tile("/ceiling#ceiling", "ceiling", 65, 41, 0)
+	tilemap.set_tile("/wall_left#wall_left", "wall_left", 0, 0, 0)
+	tilemap.set_tile("/wall_left#wall_left", "wall_left", 65, 41, 0)
+	tilemap.set_tile("/wall_right#wall_right", "wall_right", 0, 0, 0)
+	tilemap.set_tile("/wall_right#wall_right", "wall_right", 65, 41, 0)
+
+	local tiles = {floor = {spikes = {17, 9, 1}, wall = {3, 3, 3}, bounce = {19, 19, 19}},
+	wall_left = {spikes = {18, 10, 2}, wall = {4, 4, 4}, bounce = {20, 20, 20} },
+	ceiling = {spikes = {41, 33, 25}, wall = {12, 12, 12}, bounce = {28, 28, 28}},
+	wall_right = {spikes = {42, 34, 26}, wall = {11, 11, 11}, bounce = {27, 27, 27}}}
+			
+	for y = 1, 3 do
+		for x = 1, 64 do
+			tilemap.set_tile("/floor#floor", "floor", x, y, tiles.floor[settings.arena_floor][y])
+			tilemap.set_tile("/ceiling#ceiling", "ceiling", x, 41 - y, tiles.ceiling[settings.arena_ceiling][y])
+			if x < 41 then
+				tilemap.set_tile("/wall_left#wall_left", "wall_left", y, x, tiles.wall_left[settings.arena_wall_left][y])
+				tilemap.set_tile("/wall_right#wall_right", "wall_right", 65 - y, x, tiles.wall_right[settings.arena_wall_right][y])
+			end
+		end
+	end
+
+	if settings.arena_floor == "bounce" then
+		msg.post("/floor#co_wall", "disable")
+	else
+		msg.post("/floor#co_bounce", "disable")
+	end
+	if settings.arena_ceiling == "bounce" then
+		msg.post("/ceiling#co_wall", "disable")
+	else
+		msg.post("/ceiling#co_bounce", "disable")
+	end
+	if settings.arena_wall_left == "bounce" then
+		msg.post("/wall_left#co_wall", "disable")
+	else
+		msg.post("/wall_left#co_bounce", "disable")
+	end
+	if settings.arena_wall_right == "bounce" then
+		msg.post("/wall_right#co_wall", "disable")
+	else
+		msg.post("/wall_right#co_bounce", "disable")
 	end
 end
 

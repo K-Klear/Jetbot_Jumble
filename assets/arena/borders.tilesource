@@ -1,6 +1,6 @@
 image: "/assets/arena/borders.png"
-tile_width: 128
-tile_height: 128
+tile_width: 16
+tile_height: 16
 tile_margin: 1
 tile_spacing: 1
 collision: "/assets/arena/borders.png"
@@ -17,15 +17,237 @@ convex_hulls {
 }
 convex_hulls {
   index: 12
+  count: 4
+  collision_group: "wall"
+}
+convex_hulls {
+  index: 16
+  count: 4
+  collision_group: "wall"
+}
+convex_hulls {
+  index: 20
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 20
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 20
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 20
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 20
   count: 6
   collision_group: "spikes"
 }
 convex_hulls {
-  index: 18
+  index: 26
   count: 6
   collision_group: "spikes"
 }
+convex_hulls {
+  index: 32
+  count: 4
+  collision_group: "wall"
+}
+convex_hulls {
+  index: 36
+  count: 4
+  collision_group: "wall"
+}
+convex_hulls {
+  index: 40
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 40
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 40
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 40
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 40
+  count: 4
+  collision_group: "spikes"
+}
+convex_hulls {
+  index: 44
+  count: 4
+  collision_group: "spikes"
+}
+convex_hulls {
+  index: 48
+  count: 4
+  collision_group: "bounce"
+}
+convex_hulls {
+  index: 52
+  count: 4
+  collision_group: "bounce"
+}
+convex_hulls {
+  index: 56
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 56
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 56
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 56
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 56
+  count: 6
+  collision_group: "spikes"
+}
+convex_hulls {
+  index: 62
+  count: 6
+  collision_group: "spikes"
+}
+convex_hulls {
+  index: 68
+  count: 4
+  collision_group: "bounce"
+}
+convex_hulls {
+  index: 72
+  count: 4
+  collision_group: "bounce"
+}
+convex_hulls {
+  index: 76
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 76
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 76
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 76
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 76
+  count: 6
+  collision_group: "spikes"
+}
+convex_hulls {
+  index: 82
+  count: 6
+  collision_group: "spikes"
+}
+convex_hulls {
+  index: 88
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 88
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 88
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 88
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 88
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 88
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 88
+  count: 4
+  collision_group: "spikes"
+}
+convex_hulls {
+  index: 92
+  count: 4
+  collision_group: "spikes"
+}
+convex_hulls {
+  index: 96
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 96
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 96
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 96
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 96
+  count: 0
+  collision_group: ""
+}
+convex_hulls {
+  index: 96
+  count: 0
+  collision_group: ""
+}
+collision_groups: "bounce"
 collision_groups: "spikes"
+collision_groups: "wall"
 animations {
   id: "anim"
   start_tile: 1

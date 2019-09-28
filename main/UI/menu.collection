@@ -2,6 +2,7 @@ name: "menu"
 scale_along_z: 0
 embedded_instances {
   id: "menu"
+  children: "arena_preview"
   data: "components {\n"
   "  id: \"main_menu\"\n"
   "  component: \"/main/UI/main_menu.gui\"\n"
@@ -33,5 +34,40 @@ embedded_instances {
     x: 1.0
     y: 1.0
     z: 1.0
+  }
+}
+embedded_instances {
+  id: "arena_preview"
+  data: "components {\n"
+  "  id: \"arena_preview\"\n"
+  "  component: \"/main/UI/arena_preview.tilemap\"\n"
+  "  position {\n"
+  "    x: -500.0\n"
+  "    y: -340.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 1186.0
+    y: 463.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 0.25
+    y: 0.25
+    z: 0.25
   }
 }

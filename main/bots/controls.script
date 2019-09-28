@@ -72,6 +72,8 @@ function on_message(self, message_id, message, sender)
 	if message_id == hash("collision_response") then
 		if message.group == hash("spikes") then
 			die(self)
+		elseif message.group == hash("bounce") then
+			
 		end
 	elseif message_id == hash("button_pressed") then
 		self[message.button] = true
