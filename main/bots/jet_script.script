@@ -8,5 +8,9 @@ function on_message(self, message_id, message, sender)
 		self.alive = false
 	elseif message_id == hash("death") then
 		self.alive = false
+	elseif message_id == hash("vulnerable") then
+		self.alive = true
+	elseif message_id == hash("invulnerable") then
+		self.alive = false
 	end
 end

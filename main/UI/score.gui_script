@@ -1,9 +1,13 @@
 local score = {0, 0}
 local buttons = {}
+local ready_label
 local settings = require("main/game_settings")
 
 local death_timer = {}
 local bot_alive = {true, true}
+
+local game_in_progress = true
+local player_colour = {vmath.vector4(0, 0.5, 0.5, 1), vmath.vector4(1, 0, 1, 1)}
 
 function init(self)
 	buttons.p1_left = gui.get_node("button_player1_left")
@@ -12,16 +16,20 @@ function init(self)
 	buttons.p2_left = gui.get_node("button_player2_left")
 	buttons.p2_right = gui.get_node("button_player2_right")
 	buttons.p2_up = gui.get_node("button_player2_up")
+	ready_label = gui.get_node("ready_go")
+	winner_label = gui.get_node("winner")
 end
 
 function on_message(self, message_id, message, sender)
-	if message_id == hash("death") then
+	if message_id == hash("death") and game_in_progress then
 		if bot_alive[message.player] then	-- this prevents the double score bug, but there should be a better way
 			bot_alive[message.player] = false
 			score[message.player] = score[message.player] + 1
 			gui.set_text(gui.get_node("score_"..message.player), score[message.player])
 			if score[message.player] >= settings.max_score then
-				msg.post(msg.url("bootstrap:/go"), "end")
+				game_in_progress = false
+				gui.set_color(winner_label, player_colour[message.player])
+				timer.delay(5, false, function() msg.post(msg.url("bootstrap:/go"), "end") end)
 			end
 			timer.delay(1, false, function() bot_alive[message.player] = true end)
 		end
@@ -31,5 +39,8 @@ function on_message(self, message_id, message, sender)
 		else
 			gui.set_color(buttons[message.button], vmath.vector4(0.1, 0.1, 0.1, 1))
 		end
+	elseif message_id == hash("go") then
+		gui.set_text(ready_label, "GO!")
+		gui.animate(ready_label, "color.w", 0, gui.EASING_LINEAR, 1, 0.25)
 	end
 end

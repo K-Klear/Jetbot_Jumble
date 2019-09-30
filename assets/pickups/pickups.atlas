@@ -10,6 +10,21 @@ images {
 images {
   image: "/assets/pickups/spin.png"
 }
+images {
+  image: "/assets/pickups/zero_g.png"
+}
+images {
+  image: "/assets/pickups/zero_g_particle.png"
+}
+images {
+  image: "/assets/pickups/confusion.png"
+}
+images {
+  image: "/assets/pickups/shield.png"
+}
+images {
+  image: "/assets/pickups/shield_pickup.png"
+}
 margin: 1
 extrude_borders: 2
 inner_padding: 1

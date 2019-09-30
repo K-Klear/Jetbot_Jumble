@@ -5,6 +5,9 @@ go.property("secret", false)
 local sprites = {}
 sprites[hash("jet")] = "jet"
 sprites[hash("spin")] = "spin"
+sprites[hash("zero_g")] = "zero_g"
+sprites[hash("confusion")] = "confusion"
+sprites[hash("shield")] = "shield_pickup"
 
 
 function init(self)
@@ -27,9 +30,9 @@ function on_message(self, message_id, message, sender)
 		go.animate("#sprite", "tint.w", go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 1, 0, remove)
 	elseif message_id == hash("trigger_response") then
 		particlefx.play("#pickup")
-		msg.post("/main", "pickup_removed")
-		msg.post(message.other_id, "pickup", {type = self.type})
+		msg.post("/main", "pickup_got", {player = message.other_id, type = self.type, curse = self.curse})
 		msg.post("#co", "disable")
-		go.animate("#sprite", "tint.w", go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 0.25, 0, remove)
+		go.animate("#sprite", "tint.w", go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 0.25, 0)
 	end
 end
+

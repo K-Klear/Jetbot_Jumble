@@ -13,6 +13,21 @@ components {
     w: 1.0
   }
 }
+components {
+  id: "zero_g"
+  component: "/main/pickups/zero_g.particlefx"
+  position {
+    x: 0.0
+    y: -68.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
 embedded_components {
   id: "body"
   type: "sprite"
@@ -173,6 +188,26 @@ embedded_components {
   position {
     x: 0.0
     y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "shield"
+  type: "sprite"
+  data: "tile_set: \"/assets/pickups/pickups.atlas\"\n"
+  "default_animation: \"shield\"\n"
+  "material: \"/builtins/materials/sprite.material\"\n"
+  "blend_mode: BLEND_MODE_ALPHA\n"
+  ""
+  position {
+    x: 0.0
+    y: -15.0
     z: 0.0
   }
   rotation {

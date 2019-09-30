@@ -4,6 +4,7 @@ go.property("player", 1)
 go.property("up", 1)
 go.property("left", 1)
 go.property("right", 1)
+go.property("alive", true)
 
 
 local jet_power = {
@@ -25,7 +26,6 @@ function init(self)
 	{upper_angle = math.rad(120), lower_angle = math.rad(120), enable_limit = true})
 	physics.create_joint(physics.JOINT_TYPE_HINGE, "jet_top_right#co", "joint", vmath.vector3(0, 0, 0), "body#co_body", vmath.vector3(20, 0, 0),
 	{upper_angle = math.rad(-120), lower_angle = math.rad(-120), enable_limit = true})
-	self.alive = true
 	self.jet_type = "#flame"
 	self.jet_top_left = false
 	self.jet_top_right = false
@@ -47,6 +47,7 @@ function init(self)
 		sprite.play_flipbook("jet_top_left#jet", "jet2")
 		sprite.play_flipbook("jet_top_right#jet", "jet2")
 	end
+	sprite.set_constant("#shield", "tint", vmath.vector4(1, 1, 1, 0))
 end
 
 local function die(self)
@@ -60,6 +61,31 @@ local function die(self)
 	end
 	if self.boost then timer.cancel(self.boost) end
 	self.jet_power_multiplier = 1
+	if self.zero_g then timer.cancel(self.zero_g); self.zero_g = nil end
+	particlefx.stop("#zero_g")
+	if self.confusion then
+		timer.cancel(self.confusion)
+		self.confusion = nil
+		if self.player == 1 then
+			self.left = hash("p1_left")
+			self.right = hash("p1_right")
+			sprite.play_flipbook("body#body", "body")
+			sprite.play_flipbook("jet_bottom_left#jet", "jet")
+			sprite.play_flipbook("jet_bottom_right#jet", "jet")
+			sprite.play_flipbook("jet_top_left#jet", "jet")
+			sprite.play_flipbook("jet_top_right#jet", "jet")
+		else
+			self.left = hash("p2_left")
+			self.right = hash("p2_right")
+			sprite.play_flipbook("body#body", "body2")
+			sprite.play_flipbook("jet_bottom_left#jet", "jet2")
+			sprite.play_flipbook("jet_bottom_right#jet", "jet2")
+			sprite.play_flipbook("jet_top_left#jet", "jet2")
+			sprite.play_flipbook("jet_top_right#jet", "jet2")
+		end
+	end
+	if self.shield then timer.cancel(self.shield); self.shield = nil end
+	sprite.set_constant("#shield", "tint", vmath.vector4(1, 1, 1, 0))
 	msg.post(".", "disable")
 	msg.post("/main", "death", {player = self.player})
 	msg.post("jet_bottom_left", "death")
@@ -70,7 +96,7 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("collision_response") then
-		if message.group == hash("spikes") then
+		if message.group == hash("spikes") and not self.shield then
 			die(self)
 		elseif message.group == hash("bounce") then
 			
@@ -104,14 +130,85 @@ function on_message(self, message_id, message, sender)
 		elseif message.type == hash("spin") then
 			msg.post("body#co_body", "apply_force", {force = vmath.vector3(settings.curse_spin_force, 0, 0), position = vmath.vector3(0, 200, 0)})
 			msg.post("body#co_body", "apply_force", {force = vmath.vector3(-settings.curse_spin_force, 0, 0), position = vmath.vector3(0, -200, 0)})
+		elseif message.type == hash("zero_g") then
+			if self.zero_g then timer.cancel(self.zero_g) end
+			particlefx.stop("#zero_g")
+			particlefx.play("#zero_g")
+			self.zero_g = timer.delay(settings.pickup_zero_g_duration, false, function()
+				self.zero_g = nil
+				particlefx.stop("#zero_g")
+			end)
+		elseif message.type == hash("shield") then
+			if self.shield then timer.cancel(self.shield) end
+			sprite.set_constant("#shield", "tint", vmath.vector4(1, 1, 1, 0.8))
+			for key in pairs(jet_power) do
+				msg.post(key, "invulnerable")
+			end
+			self.shield = timer.delay(settings.pickup_shield_duration, false, function()
+				self.shield = nil
+				sprite.set_constant("#shield", "tint", vmath.vector4(1, 1, 1, 0))
+				for key in pairs(jet_power) do
+					msg.post(key, "vulnerable")
+				end
+			end)
+		elseif message.type == hash("confusion") then
+			if self.confusion then timer.cancel(self.confusion) end
+			if self.player == 1 then
+				self.left = hash("p1_right")
+				self.right = hash("p1_left")
+				sprite.play_flipbook("body#body", "body_inverted")
+				for key in pairs(jet_power) do
+					sprite.play_flipbook(key.."#jet", "jet_inverted")
+				end
+			else
+				self.left = hash("p2_right")
+				self.right = hash("p2_left")
+				sprite.play_flipbook("body#body", "body2_inverted")
+				for key in pairs(jet_power) do
+					sprite.play_flipbook(key.."#jet", "jet2_inverted")
+				end
+			end
+			self.confusion = timer.delay(settings.pickup_confusion_duration, false, function()
+				self.confusion = nil
+				if self.player == 1 then
+					self.left = hash("p1_left")
+					self.right = hash("p1_right")
+					sprite.play_flipbook("body#body", "body")
+					sprite.play_flipbook("jet_bottom_left#jet", "jet")
+					sprite.play_flipbook("jet_bottom_right#jet", "jet")
+					sprite.play_flipbook("jet_top_left#jet", "jet")
+					sprite.play_flipbook("jet_top_right#jet", "jet")
+				else
+					self.left = hash("p2_left")
+					self.right = hash("p2_right")
+					sprite.play_flipbook("body#body", "body2")
+					sprite.play_flipbook("jet_bottom_left#jet", "jet2")
+					sprite.play_flipbook("jet_bottom_right#jet", "jet2")
+					sprite.play_flipbook("jet_top_left#jet", "jet2")
+					sprite.play_flipbook("jet_top_right#jet", "jet2")
+				end
+			end)
 		else
 			print("Unknown pickup type")
 		end
+	elseif message_id == hash("start") then
+		self.alive = true
+		msg.post("body#co_body", "apply_force", {force = vmath.vector3(0, 0, 0), position = go.get_world_position("body")})
 	end
 end
 
 function update(self, dt)
 	if self.alive then
+		if self.zero_g then
+			local force = (settings.gravity * 7.5) / 1.6205
+			msg.post("body#co_body", "apply_force", {force = vmath.vector3(0, force, 0), position = go.get_world_position("body")})
+			msg.post("body#co_head", "apply_force", {force = vmath.vector3(0, force, 0), position = go.get_world_position("body")})
+			msg.post("jet_bottom_left#co", "apply_force", {force = vmath.vector3(0, force, 0), position = go.get_world_position("body")})
+			msg.post("jet_bottom_right#co", "apply_force", {force = vmath.vector3(0, force, 0), position = go.get_world_position("body")})
+			msg.post("jet_top_left#co", "apply_force", {force = vmath.vector3(0, force, 0), position = go.get_world_position("body")})
+			msg.post("jet_top_right#co", "apply_force", {force = vmath.vector3(0, force, 0), position = go.get_world_position("body")})
+		end
+		
 		local config = {}
 		if self.key_pressed_left == true then config.jet_top_right = true end
 		if self.key_pressed_right == true then config.jet_top_left = true end

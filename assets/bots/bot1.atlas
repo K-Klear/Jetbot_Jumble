@@ -13,6 +13,18 @@ images {
 images {
   image: "/assets/bots/jet2.png"
 }
+images {
+  image: "/assets/bots/body2_inverted.png"
+}
+images {
+  image: "/assets/bots/body_inverted.png"
+}
+images {
+  image: "/assets/bots/jet2_inverted.png"
+}
+images {
+  image: "/assets/bots/jet_inverted.png"
+}
 margin: 1
 extrude_borders: 1
 inner_padding: 1
